@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Time Offset Calculator</title>
+    <!-- Favicon: A Clock Emoji ⏰ -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⏰</text></svg>">
     <style>
         :root {
             --bg-color: #ffffff;
@@ -110,11 +112,13 @@
 
     <div class="container">
         
+        <!-- Start Time -->
         <div>
             <label for="startTime">Start Time</label>
             <input type="time" id="startTime">
         </div>
 
+        <!-- Duration Inputs -->
         <div class="input-group">
             <div style="flex: 1;">
                 <label for="addHours">Add Hours</label>
@@ -126,6 +130,7 @@
             </div>
         </div>
 
+        <!-- Result -->
         <div class="result-box">
             <div class="result-label">The time will be</div>
             <div id="result-time">--:--</div>

@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notion Widgets Collection</title>
+    <!-- Favicon: A Toolbox Emoji 🧰 -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧰</text></svg>">
+    <style>
+        :root {
+            --bg-color: #ffffff;
+            --text-color: #37352f;
+            --hover-bg: #f7f9fb;
+            --border-color: #e6e6e6;
+            --accent-color: #2383e2;
+        }
+
+        /* Dark mode support */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-color: #191919;
+                --text-color: #d4d4d4;
+                --hover-bg: #2d2d2d;
+                --border-color: #3f3f3f;
+            }
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 40px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+        }
+
+        h1 {
+            font-size: 24px;
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+
+        p {
+            color: var(--text-color);
+            opacity: 0.7;
+            margin-bottom: 30px;
+            font-size: 16px;
+        }
+
+        .widget-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .widget-item {
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .widget-item:last-child {
+            border-bottom: none;
+        }
+
+        .widget-link {
+            display: flex;
+            align-items: center;
+            padding: 16px 20px;
+            text-decoration: none;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            transition: background-color 0.2s ease;
+        }
+
+        .widget-link:hover {
+            background-color: var(--hover-bg);
+        }
+
+        .icon {
+            font-size: 24px;
+            margin-right: 15px;
+        }
+
+        .info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .name {
+            font-weight: 600;
+            font-size: 16px;
+            margin-bottom: 2px;
+        }
+
+        .desc {
+            font-size: 14px;
+            opacity: 0.6;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Notion Widgets</h1>
+        <p>A personal collection of custom HTML tools.</p>
+
+        <ul class="widget-list">
+            
+            <!-- Time Calculator -->
+            <li class="widget-item">
+                <a href="./time-calculator/" class="widget-link">
+                    <span class="icon">⏰</span>
+                    <div class="info">
+                        <span class="name">Time Calculator</span>
+                        <span class="desc">Calculate future times based on current time + duration.</span>
+                    </div>
+                </a>
+            </li>
+
+            <!-- Add new widgets here in the future by copying the 'li' block above -->
+
+        </ul>
+    </div>
+
+</body>
+</html>
