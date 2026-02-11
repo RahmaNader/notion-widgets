@@ -1,15 +1,15 @@
 /* Root Variables */
 :root {
     /* Default Purple Theme */
-    --brand-color: #a855f7;      /* purple-500 */
-    --brand-hover: #9333ea;      /* purple-600 */
-    --brand-light: #faf5ff;      /* purple-50 */
-    --brand-text: #6b21a8;       /* purple-800 */
-    --page-bg: #f8fafc;          /* Light mode background */
+    --brand-color: #a855f7;       /* purple-500 */
+    --brand-hover: #9333ea;       /* purple-600 */
+    --brand-light: #faf5ff;       /* purple-50 */
+    --brand-text: #6b21a8;        /* purple-800 */
+    --page-bg: #f8fafc;           /* Light mode background */
 }
 
 .dark {
-    --page-bg: #111827;          /* Dark mode background */
+    --page-bg: #111827;           /* Dark mode background */
 }
 
 /* Theme Overrides */
