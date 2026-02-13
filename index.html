@@ -285,12 +285,19 @@
           </p>
         </a>
 
-        <!-- Placeholder for future widget (Optional visual balance) -->
+        <!-- 4. Quick Scratchpad -->
         <div
-          class="border-2 border-dashed border-gray-200 dark:border-darkBorder rounded-2xl p-6 flex flex-col items-center justify-center text-center text-gray-400 dark:text-gray-600 min-h-[200px]"
+          class="bg-white dark:bg-darkSurface p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-darkBorder flex flex-col relative overflow-hidden group"
         >
-          <span class="text-3xl mb-2 opacity-50">✨</span>
-          <span class="font-medium">More coming soon</span>
+          <h2 class="text-xl font-bold text-gray-800 dark:text-white mb-4">
+            <i class="fa-solid fa-note-sticky mr-2 text-yellow-500"></i
+            >Scratchpad
+          </h2>
+          <textarea
+            id="scratchpad"
+            class="w-full flex-grow min-h-[140px] bg-yellow-50 dark:bg-gray-800/50 p-4 rounded-xl text-sm text-gray-700 dark:text-gray-300 resize-none focus:outline-none focus:ring-2 focus:ring-yellow-400/50 placeholder-gray-400 border-none transition-colors"
+            placeholder="Type quick notes here..."
+          ></textarea>
         </div>
       </div>
     </div>
@@ -425,6 +432,15 @@
 
       // Initialize weather on load
       initWeather();
+
+      /* --- Quick Scratchpad Logic --- */
+      const scratchpad = document.getElementById("scratchpad");
+      if (localStorage.scratchpadContent) {
+        scratchpad.value = localStorage.scratchpadContent;
+      }
+      scratchpad.addEventListener("input", (e) => {
+        localStorage.scratchpadContent = e.target.value;
+      });
     </script>
   </body>
 </html>
