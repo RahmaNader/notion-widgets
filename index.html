@@ -89,7 +89,7 @@
         background-color: var(--bg-color);
         color: var(--text-color);
         margin: 0;
-        padding: 40px 20px;
+        padding: 20px;
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -117,61 +117,15 @@
         font-size: 16px;
       }
 
-      .widget-list {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-        border: 1px solid var(--border-color);
-        border-radius: 8px;
-        overflow: hidden;
-      }
-
-      .widget-item {
-        border-bottom: 1px solid var(--border-color);
-      }
-
-      .widget-item:last-child {
-        border-bottom: none;
-      }
-
-      .widget-link {
-        display: flex;
-        align-items: center;
-        padding: 16px 20px;
-        text-decoration: none;
-        color: var(--text-color);
-        background-color: var(--bg-color);
-        transition: background-color 0.2s ease;
-      }
-
       .widget-link:hover {
         background-color: var(--hover-bg);
       }
 
-      .icon {
-        font-size: 24px;
-        margin-right: 15px;
-      }
-
-      .info {
-        display: flex;
-        flex-direction: column;
-      }
-
-      .name {
-        font-weight: 600;
-        font-size: 16px;
-        margin-bottom: 2px;
-      }
-
-      .desc {
-        font-size: 14px;
-        opacity: 0.6;
-      }
+      /* Removed old list styles that conflicted with grid */
     </style>
   </head>
   <body
-    class="bg-gray-50 dark:bg-darkBg text-gray-800 dark:text-gray-100 min-h-screen flex flex-col items-center py-10 px-5 font-sans transition-colors duration-300"
+    class="bg-gray-100 dark:bg-darkBg text-gray-800 dark:text-gray-100 min-h-screen flex flex-col items-center py-10 px-5 font-sans transition-colors duration-300"
   >
     <div class="fixed top-4 right-4 flex gap-3 z-50">
       <button
@@ -213,74 +167,132 @@
       </div>
     </div>
 
-    <div class="w-full max-w-2xl">
-      <h1 class="text-3xl font-bold mb-2 text-gray-900 dark:text-white">
-        Notion Widgets
-      </h1>
-      <p class="text-gray-500 dark:text-gray-400 mb-8 text-lg">
-        A personal collection of custom HTML tools.
-      </p>
-
-      <ul
-        class="rounded-xl border border-gray-200 dark:border-darkBorder overflow-hidden bg-white dark:bg-darkSurface shadow-sm"
-      >
-        <!-- Time Calculator -->
-        <li
-          class="border-b border-gray-100 dark:border-darkBorder last:border-none"
+    <div class="w-full max-w-6xl px-4">
+      <header class="mb-10 text-center">
+        <h1
+          class="text-4xl font-extrabold mb-3 text-gray-900 dark:text-white tracking-tight"
         >
-          <a
-            href="./time-calculator/"
-            class="flex items-center p-5 hover:bg-brandLight dark:hover:bg-gray-800/50 transition duration-200 group"
+          Notion Widgets
+        </h1>
+        <p class="text-gray-500 dark:text-gray-400 text-lg max-w-xl mx-auto">
+          A personal collection of custom HTML tools designed to enhance your
+          Notion workspace.
+        </p>
+      </header>
+
+      <!-- Dashboard Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- 1. Digital Clock Widget -->
+        <div
+          class="bg-white dark:bg-darkSurface p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-darkBorder flex flex-col justify-center items-center relative overflow-hidden group"
+        >
+          <div class="absolute top-0 right-0 p-4 opacity-10">
+            <i class="fa-regular fa-clock text-8xl dark:text-gray-600"></i>
+          </div>
+          <div
+            id="live-time"
+            class="text-5xl font-mono font-bold text-gray-800 dark:text-white mb-2 z-10 tracking-widest relative"
           >
-            <span
-              class="text-3xl mr-5 group-hover:scale-110 transition duration-200"
-              >⏰</span
+            --:--
+          </div>
+          <div
+            id="live-date"
+            class="text-sm font-medium text-brand dark:text-brandLight uppercase tracking-widest z-10"
+          >
+            Loading Date...
+          </div>
+        </div>
+
+        <!-- 2. Weather Widget (Spans 2 columns on large screens) -->
+        <div
+          class="md:col-span-2 bg-gradient-to-br from-brandLight to-white dark:from-gray-800 dark:to-darkSurface p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-darkBorder relative"
+        >
+          <div class="flex items-center justify-between mb-6">
+            <h2 class="text-xl font-bold text-gray-800 dark:text-white">
+              <i class="fa-solid fa-cloud-sun-rain mr-2 text-brand"></i>Weekly
+              Forecast
+            </h2>
+            <button
+              onclick="initWeather()"
+              class="text-xs text-gray-500 hover:text-brand transition"
+              title="Refresh Weather"
             >
-            <div class="flex flex-col">
-              <span
-                class="font-bold text-gray-800 dark:text-gray-200 text-lg mb-1 group-hover:text-brand transition"
-                >Time Calculator</span
-              >
-              <span class="text-sm text-gray-500 dark:text-gray-400"
-                >Calculate future times based on current time + duration.</span
-              >
+              <i class="fa-solid fa-location-dot mr-1"></i>Maadi, Cairo
+            </button>
+          </div>
+
+          <!-- Weather Container -->
+          <div
+            id="weather-display"
+            class="grid grid-cols-4 sm:grid-cols-7 gap-2 text-center"
+          >
+            <div class="col-span-full py-8 text-gray-400 text-sm animate-pulse">
+              <i class="fa-solid fa-satellite-dish fa-spin mr-2"></i> Fetching
+              weather data...
+            </div>
+          </div>
+        </div>
+
+        <!-- Time Calculator -->
+        <a
+          href="./time-calculator/"
+          class="group block bg-white dark:bg-darkSurface p-6 rounded-2xl shadow-sm hover:shadow-xl border border-gray-100 dark:border-darkBorder transition-all duration-300 hover:-translate-y-1"
+        >
+          <div class="flex items-start justify-between mb-4">
+            <div
+              class="w-12 h-12 flex items-center justify-center rounded-xl bg-purple-100 dark:bg-gray-800 text-2xl group-hover:bg-brandLight transition-colors"
+            >
+              ⏰
             </div>
             <i
-              class="fa-solid fa-chevron-right ml-auto text-gray-300 group-hover:text-brand transition"
+              class="fa-solid fa-arrow-up-right-from-square text-gray-300 group-hover:text-brand transition-colors text-sm"
             ></i>
-          </a>
-        </li>
+          </div>
+          <h2
+            class="text-xl font-bold text-gray-800 dark:text-white mb-2 group-hover:text-brand transition-colors"
+          >
+            Time Calculator
+          </h2>
+          <p class="text-gray-500 dark:text-gray-400 text-sm leading-relaxed">
+            Calculate future times based on current time + duration. Perfect for
+            planning schedules.
+          </p>
+        </a>
 
         <!-- Pipeline Timer -->
-        <li
-          class="border-b border-gray-100 dark:border-darkBorder last:border-none"
+        <a
+          href="./pipeline-timer/"
+          class="group block bg-white dark:bg-darkSurface p-6 rounded-2xl shadow-sm hover:shadow-xl border border-gray-100 dark:border-darkBorder transition-all duration-300 hover:-translate-y-1"
         >
-          <a
-            href="./pipeline-timer/"
-            class="flex items-center p-5 hover:bg-brandLight dark:hover:bg-gray-800/50 transition duration-200 group"
-          >
-            <span
-              class="text-3xl mr-5 group-hover:scale-110 transition duration-200"
-              >🧩</span
+          <div class="flex items-start justify-between mb-4">
+            <div
+              class="w-12 h-12 flex items-center justify-center rounded-xl bg-blue-100 dark:bg-gray-800 text-2xl group-hover:bg-brandLight transition-colors"
             >
-            <div class="flex flex-col">
-              <span
-                class="font-bold text-gray-800 dark:text-gray-200 text-lg mb-1 group-hover:text-brand transition"
-                >Pipeline Timer</span
-              >
-              <span class="text-sm text-gray-500 dark:text-gray-400"
-                >Track and manage task pipeline timing with visual
-                progress.</span
-              >
+              🧩
             </div>
             <i
-              class="fa-solid fa-chevron-right ml-auto text-gray-300 group-hover:text-brand transition"
+              class="fa-solid fa-arrow-up-right-from-square text-gray-300 group-hover:text-brand transition-colors text-sm"
             ></i>
-          </a>
-        </li>
+          </div>
+          <h2
+            class="text-xl font-bold text-gray-800 dark:text-white mb-2 group-hover:text-brand transition-colors"
+          >
+            Pipeline Timer
+          </h2>
+          <p class="text-gray-500 dark:text-gray-400 text-sm leading-relaxed">
+            Track and manage task pipeline timing with visual progress
+            indicators and stage tracking.
+          </p>
+        </a>
 
-        <!-- Add new widgets here... -->
-      </ul>
+        <!-- Placeholder for future widget (Optional visual balance) -->
+        <div
+          class="border-2 border-dashed border-gray-200 dark:border-darkBorder rounded-2xl p-6 flex flex-col items-center justify-center text-center text-gray-400 dark:text-gray-600 min-h-[200px]"
+        >
+          <span class="text-3xl mb-2 opacity-50">✨</span>
+          <span class="font-medium">More coming soon</span>
+        </div>
+      </div>
     </div>
 
     <script>
@@ -317,6 +329,102 @@
       // Load saved color theme
       const savedColor = localStorage.getItem("colorTheme");
       if (savedColor) setTheme(savedColor);
+
+      /* --- Digital Clock Logic --- */
+      function updateClock() {
+        const now = new Date();
+        const timeString = now.toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+        const dateOptions = { weekday: "long", month: "short", day: "numeric" };
+        const dateString = now.toLocaleDateString(undefined, dateOptions);
+
+        document.getElementById("live-time").textContent = timeString;
+        document.getElementById("live-date").textContent = dateString;
+      }
+      setInterval(updateClock, 1000);
+      updateClock();
+
+      /* --- Weather Logic (Open-Meteo API) --- */
+      function getWeatherIcon(code) {
+        // WMO Weather interpretation codes (WW)
+        const icons = {
+          0: "fa-sun", // Clear sky
+          1: "fa-cloud-sun",
+          2: "fa-cloud-sun",
+          3: "fa-cloud", // Cloudy
+          45: "fa-smog",
+          48: "fa-smog", // Fog
+          51: "fa-cloud-rain",
+          53: "fa-cloud-rain",
+          55: "fa-cloud-rain", // Drizzle
+          61: "fa-cloud-showers-heavy",
+          63: "fa-cloud-showers-heavy",
+          65: "fa-cloud-showers-heavy", // Rain
+          71: "fa-snowflake",
+          73: "fa-snowflake",
+          75: "fa-snowflake", // Snow
+          95: "fa-bolt",
+          96: "fa-bolt",
+          99: "fa-bolt", // Thunderstorm
+        };
+        return icons[code] || "fa-cloud";
+      }
+
+      function initWeather() {
+        // Maadi, Cairo Coordinates
+        // Latitude: 29.9602, Longitude: 31.2569
+        fetchWeatherData(29.9602, 31.2569);
+      }
+
+      async function fetchWeatherData(lat, lon) {
+        try {
+          // Open-Meteo Free API
+          const response = await fetch(
+            `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&daily=weathercode,temperature_2m_max,temperature_2m_min&timezone=auto`,
+          );
+          const data = await response.json();
+          renderWeather(data);
+        } catch (error) {
+          document.getElementById("weather-display").innerHTML =
+            '<div class="col-span-full text-red-400 text-sm">Weather unavailable</div>';
+        }
+      }
+
+      function renderWeather(data) {
+        const container = document.getElementById("weather-display");
+        container.innerHTML = "";
+
+        const days = data.daily.time;
+        const codes = data.daily.weathercode;
+        const maxTemps = data.daily.temperature_2m_max;
+        const minTemps = data.daily.temperature_2m_min;
+
+        // Display first 7 days
+        for (let i = 0; i < 7; i++) {
+          const date = new Date(days[i]);
+          const dayName = date.toLocaleDateString(undefined, {
+            weekday: "short",
+          });
+          const iconClass = getWeatherIcon(codes[i]);
+
+          const html = `
+            <div class="flex flex-col items-center p-2 rounded-lg hover:bg-white/50 dark:hover:bg-gray-700/30 transition">
+              <span class="text-xs font-bold text-gray-500 dark:text-gray-400 mb-1">${dayName}</span>
+              <i class="fa-solid ${iconClass} text-2xl my-2 text-gray-700 dark:text-gray-200"></i>
+              <div class="text-xs font-mono">
+                <span class="text-gray-900 dark:text-white font-bold">${Math.round(maxTemps[i])}°</span>
+                <span class="text-gray-400">${Math.round(minTemps[i])}°</span>
+              </div>
+            </div>
+          `;
+          container.insertAdjacentHTML("beforeend", html);
+        }
+      }
+
+      // Initialize weather on load
+      initWeather();
     </script>
   </body>
 </html>
