@@ -1,401 +1,768 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en" class="transition-colors duration-300">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Task Pipeline Timer</title>
-    
+
     <!-- Favicon (Puzzle Piece SVG) -->
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧩</text></svg>">
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧩</text></svg>"
+    />
 
     <!-- Tailwind CSS (CDN) -->
     <script src="https://cdn.tailwindcss.com"></script>
-    
+
     <!-- Tailwind Configuration -->
     <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        brand: 'var(--brand-color)',
-                        brandHover: 'var(--brand-hover)',
-                        brandLight: 'var(--brand-light)',
-                        brandText: 'var(--brand-text)',
-                        darkBg: '#111827',
-                        darkSurface: '#1f2937',
-                        darkBorder: '#374151'
-                    },
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                        display: ['Fredoka', 'sans-serif'],
-                    }
-                }
-            }
-        }
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              brand: "var(--brand-color)",
+              brandHover: "var(--brand-hover)",
+              brandLight: "var(--brand-light)",
+              brandText: "var(--brand-text)",
+              darkBg: "#111827",
+              darkSurface: "#1f2937",
+              darkBorder: "#374151",
+            },
+            fontFamily: {
+              sans: ["Inter", "sans-serif"],
+              display: ["Fredoka", "sans-serif"],
+            },
+          },
+        },
+      };
     </script>
 
     <!-- External Libraries -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- Custom CSS (Fixed filename to style.css) -->
-    <link rel="stylesheet" href="style.css">
-</head>
-<body class="bg-gray-50 dark:bg-darkBg text-gray-800 dark:text-gray-100 h-screen flex flex-col overflow-hidden">
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fredoka:wght@500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
 
+    <!-- Custom CSS (Fixed filename to style.css) -->
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body
+    class="bg-gray-50 dark:bg-darkBg text-gray-800 dark:text-gray-100 h-screen flex flex-col overflow-hidden"
+  >
     <!-- Welcome Modal -->
-    <div id="welcome-modal" class="fixed inset-0 z-[2000] bg-white/95 dark:bg-darkBg/95 backdrop-blur-sm flex flex-col items-center justify-center transition-opacity duration-500">
-        <div class="text-center max-w-md px-6 bg-white dark:bg-darkSurface p-8 rounded-2xl shadow-2xl border border-gray-100 dark:border-darkBorder">
-            <div class="mb-6 inline-flex items-center justify-center w-20 h-20 rounded-full bg-brandLight text-brand animate-bounce">
-                <i class="fa-solid fa-puzzle-piece text-4xl"></i>
-            </div>
-            <h1 class="text-3xl font-bold text-gray-800 dark:text-white mb-2 font-display">Ready to Connect?</h1>
-            <p class="text-gray-500 dark:text-gray-400 mb-8">Build your day piece by piece.</p>
-            
-            <form onsubmit="enterApp(event)" class="w-full">
-                <div class="mb-4 text-left">
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Your Name</label>
-                    <input type="text" id="user-name-input" class="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-darkBorder focus:ring-2 focus:ring-brand focus:border-brand outline-none transition bg-gray-50 dark:bg-darkBg dark:text-white" placeholder="e.g. Alex" required>
-                </div>
-                <button type="submit" class="w-full bg-brand hover:bg-brandHover text-white font-bold py-3 rounded-xl shadow-lg transition transform hover:-translate-y-0.5">
-                    Start Puzzle <i class="fa-solid fa-arrow-right ml-2"></i>
-                </button>
-            </form>
+    <div
+      id="welcome-modal"
+      class="fixed inset-0 z-[2000] bg-white/95 dark:bg-darkBg/95 backdrop-blur-sm flex flex-col items-center justify-center transition-opacity duration-500"
+    >
+      <div
+        class="text-center max-w-md px-6 bg-white dark:bg-darkSurface p-8 rounded-2xl shadow-2xl border border-gray-100 dark:border-darkBorder"
+      >
+        <div
+          class="mb-6 inline-flex items-center justify-center w-20 h-20 rounded-full bg-brandLight text-brand animate-bounce"
+        >
+          <i class="fa-solid fa-puzzle-piece text-4xl"></i>
         </div>
+        <h1
+          class="text-3xl font-bold text-gray-800 dark:text-white mb-2 font-display"
+        >
+          Ready to Connect?
+        </h1>
+        <p class="text-gray-500 dark:text-gray-400 mb-8">
+          Build your day piece by piece.
+        </p>
+
+        <form onsubmit="enterApp(event)" class="w-full">
+          <div class="mb-4 text-left">
+            <label
+              class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+              >Your Name</label
+            >
+            <input
+              type="text"
+              id="user-name-input"
+              class="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-darkBorder focus:ring-2 focus:ring-brand focus:border-brand outline-none transition bg-gray-50 dark:bg-darkBg dark:text-white"
+              placeholder="e.g. Alex"
+              required
+            />
+          </div>
+          <button
+            type="submit"
+            class="w-full bg-brand hover:bg-brandHover text-white font-bold py-3 rounded-xl shadow-lg transition transform hover:-translate-y-0.5"
+          >
+            Start Puzzle <i class="fa-solid fa-arrow-right ml-2"></i>
+          </button>
+        </form>
+      </div>
     </div>
 
     <!-- Top Dashboard -->
-    <header class="bg-white dark:bg-darkSurface border-b border-gray-200 dark:border-darkBorder shadow-sm z-30 shrink-0 h-16">
-        <div class="flex items-center justify-between px-4 h-full">
-            <div class="flex items-center gap-4">
-                <button onclick="toggleSidebar()" class="text-gray-500 hover:text-brand focus:outline-none p-2 rounded-lg hover:bg-brandLight dark:hover:bg-darkBorder transition">
-                    <i class="fa-solid fa-bars text-xl"></i>
-                </button>
-                <div class="flex flex-col">
-                    <h1 class="font-bold text-gray-700 dark:text-white text-sm sm:text-lg leading-tight" id="app-title">Pipeline Timer</h1>
-                    <span id="user-greeting" class="text-[10px] text-brand font-semibold uppercase tracking-wide hidden sm:block">Welcome</span>
-                </div>
-            </div>
-
-            <!-- Stats Bar -->
-            <div class="flex items-center gap-4 md:gap-8">
-                <!-- View Toggle -->
-                <button onclick="toggleView()" class="hidden md:flex items-center gap-2 bg-brandLight dark:bg-darkBorder hover:bg-brand hover:text-white dark:hover:bg-gray-600 px-3 py-1.5 rounded-lg text-xs font-bold text-brand dark:text-gray-300 transition" title="Switch View">
-                    <i id="view-icon" class="fa-solid fa-puzzle-piece"></i>
-                    <span id="view-label">Puzzle View</span>
-                </button>
-                
-                <!-- Settings Trigger -->
-                <button onclick="openSettingsModal()" class="flex items-center gap-2 text-brand/60 hover:text-brand transition" title="Settings">
-                    <i class="fa-solid fa-gear"></i>
-                </button>
-
-                <div class="flex items-center gap-4 md:gap-6 border-l border-gray-200 dark:border-darkBorder pl-4">
-                    <!-- Date Display -->
-                    <div class="text-center hidden sm:block">
-                        <div class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Date</div>
-                        <div id="display-date" class="text-xl font-bold text-gray-800 dark:text-white font-mono">--/--</div>
-                    </div>
-
-                    <div class="text-center">
-                        <div class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Now</div>
-                        <div id="display-current-time" class="text-xl font-bold text-gray-800 dark:text-white font-mono">--:--</div>
-                    </div>
-                    <div class="text-center relative group cursor-help hidden sm:block">
-                        <div class="text-[10px] text-brand font-bold uppercase tracking-wider">Remaining</div>
-                        <div id="display-total-duration" class="text-xl font-bold text-brand font-mono">0m</div>
-                    </div>
-                    <div class="text-center hidden sm:block">
-                        <div class="text-[10px] text-green-500 font-bold uppercase tracking-wider">Finish</div>
-                        <div id="display-end-time" class="text-xl font-bold text-green-500 font-mono">--:--</div>
-                    </div>
-                </div>
-            </div>
+    <header
+      class="bg-white dark:bg-darkSurface border-b border-gray-200 dark:border-darkBorder shadow-sm z-30 shrink-0 h-16"
+    >
+      <div class="flex items-center justify-between px-4 h-full">
+        <div class="flex items-center gap-4">
+          <a
+            href="../index.html"
+            class="text-gray-500 hover:text-brand focus:outline-none p-2 rounded-lg hover:bg-brandLight dark:hover:bg-darkBorder transition"
+            title="Back to Home"
+          >
+            <i class="fa-solid fa-arrow-left text-xl"></i>
+          </a>
+          <button
+            onclick="toggleSidebar()"
+            class="text-gray-500 hover:text-brand focus:outline-none p-2 rounded-lg hover:bg-brandLight dark:hover:bg-darkBorder transition"
+          >
+            <i class="fa-solid fa-bars text-xl"></i>
+          </button>
+          <div class="flex flex-col">
+            <h1
+              class="font-bold text-gray-700 dark:text-white text-sm sm:text-lg leading-tight"
+              id="app-title"
+            >
+              Pipeline Timer
+            </h1>
+            <span
+              id="user-greeting"
+              class="text-[10px] text-brand font-semibold uppercase tracking-wide hidden sm:block"
+              >Welcome</span
+            >
+          </div>
         </div>
+
+        <!-- Stats Bar -->
+        <div class="flex items-center gap-4 md:gap-8">
+          <!-- View Toggle -->
+          <button
+            onclick="toggleView()"
+            class="hidden md:flex items-center gap-2 bg-brandLight dark:bg-darkBorder hover:bg-brand hover:text-white dark:hover:bg-gray-600 px-3 py-1.5 rounded-lg text-xs font-bold text-brand dark:text-gray-300 transition"
+            title="Switch View"
+          >
+            <i id="view-icon" class="fa-solid fa-puzzle-piece"></i>
+            <span id="view-label">Puzzle View</span>
+          </button>
+
+          <!-- Settings Trigger -->
+          <button
+            onclick="openSettingsModal()"
+            class="flex items-center gap-2 text-brand/60 hover:text-brand transition"
+            title="Settings"
+          >
+            <i class="fa-solid fa-gear"></i>
+          </button>
+
+          <div
+            class="flex items-center gap-4 md:gap-6 border-l border-gray-200 dark:border-darkBorder pl-4"
+          >
+            <!-- Date Display -->
+            <div class="text-center hidden sm:block">
+              <div
+                class="text-[10px] text-gray-400 font-bold uppercase tracking-wider"
+              >
+                Date
+              </div>
+              <div
+                id="display-date"
+                class="text-xl font-bold text-gray-800 dark:text-white font-mono"
+              >
+                --/--
+              </div>
+            </div>
+
+            <div class="text-center">
+              <div
+                class="text-[10px] text-gray-400 font-bold uppercase tracking-wider"
+              >
+                Now
+              </div>
+              <div
+                id="display-current-time"
+                class="text-xl font-bold text-gray-800 dark:text-white font-mono"
+              >
+                --:--
+              </div>
+            </div>
+            <div class="text-center relative group cursor-help hidden sm:block">
+              <div
+                class="text-[10px] text-brand font-bold uppercase tracking-wider"
+              >
+                Remaining
+              </div>
+              <div
+                id="display-total-duration"
+                class="text-xl font-bold text-brand font-mono"
+              >
+                0m
+              </div>
+            </div>
+            <div class="text-center hidden sm:block">
+              <div
+                class="text-[10px] text-green-500 font-bold uppercase tracking-wider"
+              >
+                Finish
+              </div>
+              <div
+                id="display-end-time"
+                class="text-xl font-bold text-green-500 font-mono"
+              >
+                --:--
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </header>
 
     <!-- Main Workspace -->
     <main class="flex-1 flex overflow-hidden relative">
-        
-        <!-- Sidebar -->
-        <aside id="sidebar" class="w-full md:w-72 bg-white dark:bg-darkSurface border-r border-gray-200 dark:border-darkBorder flex flex-col z-20 sidebar-transition relative shadow-[4px_0_24px_rgba(0,0,0,0.02)]">
-            
-            <div class="flex-1 overflow-y-auto p-5 sidebar-content transition-opacity duration-200">
-                <!-- Input Data -->
-                <div class="mb-6">
-                    <h2 class="text-xs font-bold mb-3 text-gray-400 uppercase tracking-widest">Add Tasks</h2>
-                    
-                    <!-- CSV Upload -->
-                    <label for="csv-file-input" class="group flex flex-col items-center justify-center w-full h-16 border-2 border-brand/20 dark:border-darkBorder border-dashed rounded-xl cursor-pointer bg-brandLight/30 hover:bg-brandLight hover:border-brand transition mb-2">
-                        <div class="flex flex-col items-center justify-center">
-                            <div class="flex items-center gap-2 text-brand/60 group-hover:text-brand">
-                                <i class="fa-solid fa-file-csv"></i> <span class="text-xs font-medium">Upload Notion CSV</span>
-                            </div>
-                        </div>
-                        <input id="csv-file-input" type="file" accept=".csv" class="hidden" onchange="handleFileSelect(this)" />
-                    </label>
-                    <div id="file-name-display" class="text-[10px] text-brand mt-1 h-4 overflow-hidden text-ellipsis whitespace-nowrap text-center font-medium mb-2"></div>
-                    
-                    <!-- Divider -->
-                    <div class="flex items-center gap-2 mb-2">
-                         <div class="h-[1px] bg-brand/10 dark:bg-darkBorder flex-1"></div>
-                         <span class="text-[10px] text-brand/40 font-bold">OR</span>
-                         <div class="h-[1px] bg-brand/10 dark:bg-darkBorder flex-1"></div>
-                    </div>
+      <!-- Sidebar -->
+      <aside
+        id="sidebar"
+        class="w-full md:w-72 bg-white dark:bg-darkSurface border-r border-gray-200 dark:border-darkBorder flex flex-col z-20 sidebar-transition relative shadow-[4px_0_24px_rgba(0,0,0,0.02)]"
+      >
+        <div
+          class="flex-1 overflow-y-auto p-5 sidebar-content transition-opacity duration-200"
+        >
+          <!-- Input Data -->
+          <div class="mb-6">
+            <h2
+              class="text-xs font-bold mb-3 text-gray-400 uppercase tracking-widest"
+            >
+              Add Tasks
+            </h2>
 
-                    <!-- Manual Add Button -->
-                    <button onclick="openAddTaskModal()" class="w-full bg-brandLight dark:bg-darkBorder hover:bg-brand dark:hover:bg-gray-600 hover:text-white dark:hover:text-white text-brand dark:text-gray-300 py-2 rounded-lg text-xs font-bold uppercase tracking-wide transition border border-brand/10 dark:border-transparent">
-                        <i class="fa-solid fa-plus"></i> Manual Entry
-                    </button>
-
-                    <button onclick="processFile()" class="w-full mt-2 bg-brand dark:bg-black hover:bg-brandHover dark:hover:bg-gray-900 text-white py-2 rounded-lg text-xs font-bold uppercase tracking-wide transition shadow-md shadow-brand/20">
-                        Generate Tasks
-                    </button>
+            <!-- CSV Upload -->
+            <label
+              for="csv-file-input"
+              class="group flex flex-col items-center justify-center w-full h-16 border-2 border-brand/20 dark:border-darkBorder border-dashed rounded-xl cursor-pointer bg-brandLight/30 hover:bg-brandLight hover:border-brand transition mb-2"
+            >
+              <div class="flex flex-col items-center justify-center">
+                <div
+                  class="flex items-center gap-2 text-brand/60 group-hover:text-brand"
+                >
+                  <i class="fa-solid fa-file-csv"></i>
+                  <span class="text-xs font-medium">Upload Notion CSV</span>
                 </div>
+              </div>
+              <input
+                id="csv-file-input"
+                type="file"
+                accept=".csv"
+                class="hidden"
+                onchange="handleFileSelect(this)"
+              />
+            </label>
+            <div
+              id="file-name-display"
+              class="text-[10px] text-brand mt-1 h-4 overflow-hidden text-ellipsis whitespace-nowrap text-center font-medium mb-2"
+            ></div>
 
-                <!-- Controls -->
-                <div class="mb-4">
-                    <h2 class="text-xs font-bold mb-3 text-gray-400 uppercase tracking-widest">Control Panel</h2>
-                    
-                    <!-- START BUTTON -->
-                    <button id="btn-start" onclick="toggleTimer()" class="w-full mb-3 bg-brand hover:bg-brandHover text-white py-3 rounded-xl font-bold shadow-lg shadow-brand/20 transition flex items-center justify-center gap-2 text-lg transform hover:scale-[1.02]">
-                        <i class="fa-solid fa-play"></i> <span>Start Flow</span>
-                    </button>
-
-                    <div class="grid grid-cols-2 gap-2 mb-3">
-                        <button onclick="adjustTime(60)" class="bg-white dark:bg-darkBg border border-brand/20 dark:border-darkBorder hover:bg-brandLight hover:border-brand text-brand dark:text-gray-300 py-2 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1">
-                            <i class="fa-solid fa-plus"></i> 1m
-                        </button>
-                        <button onclick="adjustTime(-60)" class="bg-white dark:bg-darkBg border border-brand/20 dark:border-darkBorder hover:bg-brandLight hover:border-brand text-brand dark:text-gray-300 py-2 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1">
-                            <i class="fa-solid fa-minus"></i> 1m
-                        </button>
-                    </div>
-
-                    <div class="space-y-2">
-                        <button onclick="skipCurrentTask()" class="w-full bg-amber-50 dark:bg-amber-900/20 hover:bg-amber-100 dark:hover:bg-amber-900/40 text-amber-700 dark:text-amber-500 border border-amber-100 dark:border-amber-900/30 py-2 rounded-lg text-sm font-medium transition flex items-center justify-center gap-2">
-                            <i class="fa-solid fa-share transform flip-horizontal"></i> Skip to End
-                        </button>
-                        <button onclick="markDoneManual()" class="w-full bg-emerald-50 dark:bg-emerald-900/20 hover:bg-emerald-100 dark:hover:bg-emerald-900/40 text-emerald-700 dark:text-emerald-500 border border-emerald-100 dark:border-emerald-900/30 py-2 rounded-lg text-sm font-medium transition flex items-center justify-center gap-2">
-                            <i class="fa-solid fa-check"></i> Mark Complete
-                        </button>
-                        <button onclick="resetTimer()" class="w-full bg-brandLight dark:bg-darkBorder hover:bg-brand dark:hover:bg-gray-600 hover:text-white dark:text-gray-300 py-2 rounded-lg text-sm font-medium transition flex items-center justify-center gap-2 text-brand border border-brand/10 dark:border-transparent">
-                            <i class="fa-solid fa-rotate-left"></i> Reset All
-                        </button>
-                        
-                         <!-- Mobile View Toggle -->
-                        <button onclick="toggleView()" class="md:hidden w-full bg-brandLight dark:bg-darkBorder hover:bg-brand text-brand hover:text-white dark:text-gray-300 py-2 rounded-lg text-sm font-medium transition flex items-center justify-center gap-2">
-                            <i class="fa-solid fa-list"></i> Toggle View
-                        </button>
-                    </div>
-                </div>
+            <!-- Divider -->
+            <div class="flex items-center gap-2 mb-2">
+              <div class="h-[1px] bg-brand/10 dark:bg-darkBorder flex-1"></div>
+              <span class="text-[10px] text-brand/40 font-bold">OR</span>
+              <div class="h-[1px] bg-brand/10 dark:bg-darkBorder flex-1"></div>
             </div>
 
-            <!-- Mini Sidebar Icons -->
-            <div class="hidden absolute top-0 left-0 w-full h-full flex-col items-center pt-24 space-y-4 sidebar-collapsed-icons z-20">
-                 <!-- SIDEBAR START -->
-                 <button id="btn-sidebar-start" onclick="toggleTimer()" class="w-10 h-10 rounded-full bg-brand text-white hover:bg-brandHover shadow-md transition flex items-center justify-center" title="Start/Pause">
-                    <i class="fa-solid fa-play text-sm"></i>
-                 </button>
-                 
-                 <div class="w-8 h-[1px] bg-brand/10"></div>
+            <!-- Manual Add Button -->
+            <button
+              onclick="openAddTaskModal()"
+              class="w-full bg-brandLight dark:bg-darkBorder hover:bg-brand dark:hover:bg-gray-600 hover:text-white dark:hover:text-white text-brand dark:text-gray-300 py-2 rounded-lg text-xs font-bold uppercase tracking-wide transition border border-brand/10 dark:border-transparent"
+            >
+              <i class="fa-solid fa-plus"></i> Manual Entry
+            </button>
 
-                 <button onclick="adjustTime(60)" class="w-8 h-8 rounded-full bg-brandLight border border-brand/20 text-brand hover:bg-brand hover:text-white transition flex items-center justify-center" title="+1 Min">
-                    <i class="fa-solid fa-plus text-xs"></i>
-                 </button>
-                 <button onclick="adjustTime(-60)" class="w-8 h-8 rounded-full bg-brandLight border border-brand/20 text-brand hover:bg-brand hover:text-white transition flex items-center justify-center" title="-1 Min">
-                    <i class="fa-solid fa-minus text-xs"></i>
-                 </button>
-                 
-                 <div class="w-8 h-[1px] bg-brand/10"></div>
+            <button
+              onclick="processFile()"
+              class="w-full mt-2 bg-brand dark:bg-black hover:bg-brandHover dark:hover:bg-gray-900 text-white py-2 rounded-lg text-xs font-bold uppercase tracking-wide transition shadow-md shadow-brand/20"
+            >
+              Generate Tasks
+            </button>
+          </div>
 
-                 <button onclick="skipCurrentTask()" class="w-8 h-8 rounded-full bg-amber-50 text-amber-600 hover:bg-amber-100 transition flex items-center justify-center" title="Skip">
-                    <i class="fa-solid fa-forward text-xs"></i>
-                 </button>
-                 <button onclick="markDoneManual()" class="w-8 h-8 rounded-full bg-emerald-50 text-emerald-600 hover:bg-emerald-100 transition flex items-center justify-center" title="Done">
-                    <i class="fa-solid fa-check text-xs"></i>
-                 </button>
-            </div>
-        </aside>
+          <!-- Controls -->
+          <div class="mb-4">
+            <h2
+              class="text-xs font-bold mb-3 text-gray-400 uppercase tracking-widest"
+            >
+              Control Panel
+            </h2>
 
-        <!-- Workspace Area -->
-        <section class="flex-1 flex flex-col bg-gray-50 dark:bg-darkBg workspace-bg relative h-full overflow-hidden">
-            
-            <!-- Puzzle/List Container -->
-            <div class="flex-1 relative flex flex-col transition-all" id="workspace">
-                <!-- Empty State -->
-                <div id="empty-state" class="absolute inset-0 flex flex-col items-center justify-center text-gray-400 pointer-events-none">
-                    <div class="bg-white dark:bg-darkSurface p-6 rounded-2xl shadow-sm mb-4 border border-brand/10 dark:border-darkBorder">
-                        <i class="fa-solid fa-layer-group text-4xl text-brand"></i>
-                    </div>
-                    <p class="text-lg font-medium text-brand/60 dark:text-gray-300">Pipeline Empty</p>
-                    <p class="text-sm text-brand/40 dark:text-gray-500">Add tasks manually or upload CSV.</p>
-                </div>
+            <!-- START BUTTON -->
+            <button
+              id="btn-start"
+              onclick="toggleTimer()"
+              class="w-full mb-3 bg-brand hover:bg-brandHover text-white py-3 rounded-xl font-bold shadow-lg shadow-brand/20 transition flex items-center justify-center gap-2 text-lg transform hover:scale-[1.02]"
+            >
+              <i class="fa-solid fa-play"></i> <span>Start Flow</span>
+            </button>
 
-                <!-- Task Container -->
-                <div id="task-container" class="hidden">
-                    <!-- Nodes injected via JS -->
-                </div>
-            </div>
-
-            <!-- Notes Section (Bottom Panel) -->
-            <div id="notes-panel" class="h-48 transition-all duration-300 ease-in-out bg-white dark:bg-darkSurface border-t border-brand/10 dark:border-darkBorder notes-panel flex flex-col z-30 shrink-0">
-                <div class="px-4 py-2 border-b border-brand/10 dark:border-darkBorder flex justify-between items-center bg-brandLight/20 dark:bg-darkBg transition">
-                    <div class="flex items-center gap-2 cursor-pointer hover:opacity-75 transition flex-1" onclick="toggleNotes()">
-                        <h3 class="text-xs font-bold text-brand uppercase tracking-widest flex items-center gap-2">
-                            <i class="fa-solid fa-note-sticky"></i> Session Notes
-                        </h3>
-                    </div>
-
-                    <div class="flex items-center gap-3">
-                         <button onclick="exportNotes(event)" class="text-[10px] bg-white dark:bg-darkBorder border border-brand/10 dark:border-transparent text-brand hover:bg-brand hover:text-white px-2 py-1 rounded transition shadow-sm" title="Export Notes">
-                            <i class="fa-solid fa-download mr-1"></i> Export
-                         </button>
-                         <div class="cursor-pointer p-1" onclick="toggleNotes()">
-                             <i id="notes-chevron" class="fa-solid fa-chevron-down text-brand/40 text-xs transition-transform duration-300"></i>
-                         </div>
-                    </div>
-                </div>
-                
-                <div class="flex-1 flex flex-col overflow-hidden">
-                    <div id="notes-list" class="flex-1 overflow-y-auto p-4 space-y-3">
-                        <div class="text-center text-xs text-brand/30 italic mt-4">No notes yet.</div>
-                    </div>
-                    <div class="p-3 bg-white dark:bg-darkSurface border-t border-brand/10 dark:border-darkBorder">
-                        <form onsubmit="addNote(event)" class="flex gap-2">
-                            <input type="text" id="note-input" class="flex-1 bg-brandLight/20 dark:bg-darkBg dark:border-darkBorder border border-brand/10 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-brand dark:text-white" placeholder="Type a note..." autocomplete="off">
-                            <button type="submit" class="bg-brandLight dark:bg-darkBorder hover:bg-brand hover:text-white dark:text-gray-300 dark:hover:text-white text-brand px-4 py-2 rounded-lg text-sm font-medium transition">
-                                <i class="fa-solid fa-paper-plane"></i>
-                            </button>
-                        </form>
-                    </div>
-                </div>
+            <div class="grid grid-cols-2 gap-2 mb-3">
+              <button
+                onclick="adjustTime(60)"
+                class="bg-white dark:bg-darkBg border border-brand/20 dark:border-darkBorder hover:bg-brandLight hover:border-brand text-brand dark:text-gray-300 py-2 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1"
+              >
+                <i class="fa-solid fa-plus"></i> 1m
+              </button>
+              <button
+                onclick="adjustTime(-60)"
+                class="bg-white dark:bg-darkBg border border-brand/20 dark:border-darkBorder hover:bg-brandLight hover:border-brand text-brand dark:text-gray-300 py-2 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1"
+              >
+                <i class="fa-solid fa-minus"></i> 1m
+              </button>
             </div>
 
-        </section>
+            <div class="space-y-2">
+              <button
+                onclick="skipCurrentTask()"
+                class="w-full bg-amber-50 dark:bg-amber-900/20 hover:bg-amber-100 dark:hover:bg-amber-900/40 text-amber-700 dark:text-amber-500 border border-amber-100 dark:border-amber-900/30 py-2 rounded-lg text-sm font-medium transition flex items-center justify-center gap-2"
+              >
+                <i class="fa-solid fa-share transform flip-horizontal"></i> Skip
+                to End
+              </button>
+              <button
+                onclick="markDoneManual()"
+                class="w-full bg-emerald-50 dark:bg-emerald-900/20 hover:bg-emerald-100 dark:hover:bg-emerald-900/40 text-emerald-700 dark:text-emerald-500 border border-emerald-100 dark:border-emerald-900/30 py-2 rounded-lg text-sm font-medium transition flex items-center justify-center gap-2"
+              >
+                <i class="fa-solid fa-check"></i> Mark Complete
+              </button>
+              <button
+                onclick="resetTimer()"
+                class="w-full bg-brandLight dark:bg-darkBorder hover:bg-brand dark:hover:bg-gray-600 hover:text-white dark:text-gray-300 py-2 rounded-lg text-sm font-medium transition flex items-center justify-center gap-2 text-brand border border-brand/10 dark:border-transparent"
+              >
+                <i class="fa-solid fa-rotate-left"></i> Reset All
+              </button>
 
-        <!-- Notification -->
-        <div id="notification-balloon" class="fixed bottom-56 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white px-6 py-3 rounded-full shadow-2xl z-[2000] flex items-center gap-3 hidden">
-            <i class="fa-solid fa-circle-check text-green-400 text-xl"></i>
-            <span id="notification-text" class="font-medium">Task Completed!</span>
+              <!-- Mobile View Toggle -->
+              <button
+                onclick="toggleView()"
+                class="md:hidden w-full bg-brandLight dark:bg-darkBorder hover:bg-brand text-brand hover:text-white dark:text-gray-300 py-2 rounded-lg text-sm font-medium transition flex items-center justify-center gap-2"
+              >
+                <i class="fa-solid fa-list"></i> Toggle View
+              </button>
+            </div>
+          </div>
         </div>
 
+        <!-- Mini Sidebar Icons -->
+        <div
+          class="hidden absolute top-0 left-0 w-full h-full flex-col items-center pt-24 space-y-4 sidebar-collapsed-icons z-20"
+        >
+          <!-- SIDEBAR START -->
+          <button
+            id="btn-sidebar-start"
+            onclick="toggleTimer()"
+            class="w-10 h-10 rounded-full bg-brand text-white hover:bg-brandHover shadow-md transition flex items-center justify-center"
+            title="Start/Pause"
+          >
+            <i class="fa-solid fa-play text-sm"></i>
+          </button>
+
+          <div class="w-8 h-[1px] bg-brand/10"></div>
+
+          <button
+            onclick="adjustTime(60)"
+            class="w-8 h-8 rounded-full bg-brandLight border border-brand/20 text-brand hover:bg-brand hover:text-white transition flex items-center justify-center"
+            title="+1 Min"
+          >
+            <i class="fa-solid fa-plus text-xs"></i>
+          </button>
+          <button
+            onclick="adjustTime(-60)"
+            class="w-8 h-8 rounded-full bg-brandLight border border-brand/20 text-brand hover:bg-brand hover:text-white transition flex items-center justify-center"
+            title="-1 Min"
+          >
+            <i class="fa-solid fa-minus text-xs"></i>
+          </button>
+
+          <div class="w-8 h-[1px] bg-brand/10"></div>
+
+          <button
+            onclick="skipCurrentTask()"
+            class="w-8 h-8 rounded-full bg-amber-50 text-amber-600 hover:bg-amber-100 transition flex items-center justify-center"
+            title="Skip"
+          >
+            <i class="fa-solid fa-forward text-xs"></i>
+          </button>
+          <button
+            onclick="markDoneManual()"
+            class="w-8 h-8 rounded-full bg-emerald-50 text-emerald-600 hover:bg-emerald-100 transition flex items-center justify-center"
+            title="Done"
+          >
+            <i class="fa-solid fa-check text-xs"></i>
+          </button>
+        </div>
+      </aside>
+
+      <!-- Workspace Area -->
+      <section
+        class="flex-1 flex flex-col bg-gray-50 dark:bg-darkBg workspace-bg relative h-full overflow-hidden"
+      >
+        <!-- Puzzle/List Container -->
+        <div
+          class="flex-1 relative flex flex-col transition-all"
+          id="workspace"
+        >
+          <!-- Empty State -->
+          <div
+            id="empty-state"
+            class="absolute inset-0 flex flex-col items-center justify-center text-gray-400 pointer-events-none"
+          >
+            <div
+              class="bg-white dark:bg-darkSurface p-6 rounded-2xl shadow-sm mb-4 border border-brand/10 dark:border-darkBorder"
+            >
+              <i class="fa-solid fa-layer-group text-4xl text-brand"></i>
+            </div>
+            <p class="text-lg font-medium text-brand/60 dark:text-gray-300">
+              Pipeline Empty
+            </p>
+            <p class="text-sm text-brand/40 dark:text-gray-500">
+              Add tasks manually or upload CSV.
+            </p>
+          </div>
+
+          <!-- Task Container -->
+          <div id="task-container" class="hidden">
+            <!-- Nodes injected via JS -->
+          </div>
+        </div>
+
+        <!-- Notes Section (Bottom Panel) -->
+        <div
+          id="notes-panel"
+          class="h-48 transition-all duration-300 ease-in-out bg-white dark:bg-darkSurface border-t border-brand/10 dark:border-darkBorder notes-panel flex flex-col z-30 shrink-0"
+        >
+          <div
+            class="px-4 py-2 border-b border-brand/10 dark:border-darkBorder flex justify-between items-center bg-brandLight/20 dark:bg-darkBg transition"
+          >
+            <div
+              class="flex items-center gap-2 cursor-pointer hover:opacity-75 transition flex-1"
+              onclick="toggleNotes()"
+            >
+              <h3
+                class="text-xs font-bold text-brand uppercase tracking-widest flex items-center gap-2"
+              >
+                <i class="fa-solid fa-note-sticky"></i> Session Notes
+              </h3>
+            </div>
+
+            <div class="flex items-center gap-3">
+              <button
+                onclick="exportNotes(event)"
+                class="text-[10px] bg-white dark:bg-darkBorder border border-brand/10 dark:border-transparent text-brand hover:bg-brand hover:text-white px-2 py-1 rounded transition shadow-sm"
+                title="Export Notes"
+              >
+                <i class="fa-solid fa-download mr-1"></i> Export
+              </button>
+              <div class="cursor-pointer p-1" onclick="toggleNotes()">
+                <i
+                  id="notes-chevron"
+                  class="fa-solid fa-chevron-down text-brand/40 text-xs transition-transform duration-300"
+                ></i>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex-1 flex flex-col overflow-hidden">
+            <div id="notes-list" class="flex-1 overflow-y-auto p-4 space-y-3">
+              <div class="text-center text-xs text-brand/30 italic mt-4">
+                No notes yet.
+              </div>
+            </div>
+            <div
+              class="p-3 bg-white dark:bg-darkSurface border-t border-brand/10 dark:border-darkBorder"
+            >
+              <form onsubmit="addNote(event)" class="flex gap-2">
+                <input
+                  type="text"
+                  id="note-input"
+                  class="flex-1 bg-brandLight/20 dark:bg-darkBg dark:border-darkBorder border border-brand/10 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-brand dark:text-white"
+                  placeholder="Type a note..."
+                  autocomplete="off"
+                />
+                <button
+                  type="submit"
+                  class="bg-brandLight dark:bg-darkBorder hover:bg-brand hover:text-white dark:text-gray-300 dark:hover:text-white text-brand px-4 py-2 rounded-lg text-sm font-medium transition"
+                >
+                  <i class="fa-solid fa-paper-plane"></i>
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Notification -->
+      <div
+        id="notification-balloon"
+        class="fixed bottom-56 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white px-6 py-3 rounded-full shadow-2xl z-[2000] flex items-center gap-3 hidden"
+      >
+        <i class="fa-solid fa-circle-check text-green-400 text-xl"></i>
+        <span id="notification-text" class="font-medium">Task Completed!</span>
+      </div>
     </main>
 
     <!-- Modals (Add, Edit, Settings, Delete, Finish) -->
-    
+
     <!-- Add Task Modal -->
-    <div id="add-task-modal" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-[2000] hidden flex items-center justify-center">
-        <div class="bg-white dark:bg-darkSurface rounded-2xl shadow-2xl p-6 w-80">
-            <h3 class="text-lg font-bold mb-4 text-gray-800 dark:text-white">Add New Task</h3>
-            <form onsubmit="handleManualAddTask(event)">
-                <div class="mb-3">
-                    <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Task Name</label>
-                    <input id="new-task-name" type="text" required class="w-full border border-gray-200 dark:border-darkBorder bg-gray-50 dark:bg-darkBg dark:text-white rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-brand outline-none">
-                </div>
-                <div class="mb-3">
-                    <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Duration (min)</label>
-                    <input id="new-task-duration" type="number" min="1" value="25" required class="w-full border border-gray-200 dark:border-darkBorder bg-gray-50 dark:bg-darkBg dark:text-white rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-brand outline-none">
-                </div>
-                <div class="mb-6">
-                    <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Category</label>
-                    <select id="new-task-category" class="w-full border border-gray-200 dark:border-darkBorder bg-gray-50 dark:bg-darkBg dark:text-white rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-brand outline-none">
-                        <option value="Work">Work</option>
-                        <option value="Study">Study</option>
-                        <option value="Break">Break</option>
-                        <option value="Health">Health</option>
-                        <option value="Other">Other</option>
-                    </select>
-                </div>
-                <div class="flex justify-end gap-2">
-                    <button type="button" onclick="document.getElementById('add-task-modal').classList.add('hidden')" class="px-4 py-2 text-sm font-semibold text-gray-500 hover:bg-gray-100 dark:hover:bg-darkBorder rounded-lg">Cancel</button>
-                    <button type="submit" class="px-6 py-2 text-sm font-bold bg-brand text-white hover:bg-brandHover rounded-lg shadow-lg">Add Task</button>
-                </div>
-            </form>
-        </div>
+    <div
+      id="add-task-modal"
+      class="fixed inset-0 bg-black/40 backdrop-blur-sm z-[2000] hidden flex items-center justify-center"
+    >
+      <div class="bg-white dark:bg-darkSurface rounded-2xl shadow-2xl p-6 w-80">
+        <h3 class="text-lg font-bold mb-4 text-gray-800 dark:text-white">
+          Add New Task
+        </h3>
+        <form onsubmit="handleManualAddTask(event)">
+          <div class="mb-3">
+            <label class="block text-xs font-bold text-gray-400 uppercase mb-1"
+              >Task Name</label
+            >
+            <input
+              id="new-task-name"
+              type="text"
+              required
+              class="w-full border border-gray-200 dark:border-darkBorder bg-gray-50 dark:bg-darkBg dark:text-white rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-brand outline-none"
+            />
+          </div>
+          <div class="mb-3">
+            <label class="block text-xs font-bold text-gray-400 uppercase mb-1"
+              >Duration (min)</label
+            >
+            <input
+              id="new-task-duration"
+              type="number"
+              min="1"
+              value="25"
+              required
+              class="w-full border border-gray-200 dark:border-darkBorder bg-gray-50 dark:bg-darkBg dark:text-white rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-brand outline-none"
+            />
+          </div>
+          <div class="mb-6">
+            <label class="block text-xs font-bold text-gray-400 uppercase mb-1"
+              >Category</label
+            >
+            <select
+              id="new-task-category"
+              class="w-full border border-gray-200 dark:border-darkBorder bg-gray-50 dark:bg-darkBg dark:text-white rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-brand outline-none"
+            >
+              <option value="Work">Work</option>
+              <option value="Study">Study</option>
+              <option value="Break">Break</option>
+              <option value="Health">Health</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+          <div class="flex justify-end gap-2">
+            <button
+              type="button"
+              onclick="
+                document
+                  .getElementById('add-task-modal')
+                  .classList.add('hidden')
+              "
+              class="px-4 py-2 text-sm font-semibold text-gray-500 hover:bg-gray-100 dark:hover:bg-darkBorder rounded-lg"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              class="px-6 py-2 text-sm font-bold bg-brand text-white hover:bg-brandHover rounded-lg shadow-lg"
+            >
+              Add Task
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
 
     <!-- Edit Modal -->
-    <div id="edit-modal" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-[2000] hidden flex items-center justify-center">
-        <div class="bg-white dark:bg-darkSurface rounded-2xl shadow-2xl p-6 w-80">
-            <h3 class="text-lg font-bold mb-4 text-gray-800 dark:text-white flex items-center gap-2">
-                <i class="fa-solid fa-pencil text-brand"></i> Edit Piece
-            </h3>
-            <div class="mb-4">
-                <label class="block text-xs font-bold text-gray-400 uppercase tracking-wide mb-1">Task Name</label>
-                <input id="edit-name" type="text" class="w-full border border-gray-200 dark:border-darkBorder bg-gray-50 dark:bg-darkBg dark:text-white rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-brand outline-none">
-            </div>
-            <div class="mb-6">
-                <label class="block text-xs font-bold text-gray-400 uppercase tracking-wide mb-1">Duration (min)</label>
-                <input id="edit-duration" type="number" min="1" class="w-full border border-gray-200 dark:border-darkBorder bg-gray-50 dark:bg-darkBg dark:text-white rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-brand outline-none font-mono">
-            </div>
-            <div class="flex justify-end gap-2">
-                <button onclick="closeEditModal()" class="px-4 py-2 text-sm font-semibold text-gray-500 hover:bg-gray-100 dark:hover:bg-darkBorder rounded-lg transition">Cancel</button>
-                <button onclick="saveEdit()" class="px-6 py-2 text-sm font-bold bg-brand text-white hover:bg-brandHover rounded-lg shadow-lg shadow-blue-200/50 transition">Save</button>
-            </div>
+    <div
+      id="edit-modal"
+      class="fixed inset-0 bg-black/40 backdrop-blur-sm z-[2000] hidden flex items-center justify-center"
+    >
+      <div class="bg-white dark:bg-darkSurface rounded-2xl shadow-2xl p-6 w-80">
+        <h3
+          class="text-lg font-bold mb-4 text-gray-800 dark:text-white flex items-center gap-2"
+        >
+          <i class="fa-solid fa-pencil text-brand"></i> Edit Piece
+        </h3>
+        <div class="mb-4">
+          <label
+            class="block text-xs font-bold text-gray-400 uppercase tracking-wide mb-1"
+            >Task Name</label
+          >
+          <input
+            id="edit-name"
+            type="text"
+            class="w-full border border-gray-200 dark:border-darkBorder bg-gray-50 dark:bg-darkBg dark:text-white rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-brand outline-none"
+          />
         </div>
+        <div class="mb-6">
+          <label
+            class="block text-xs font-bold text-gray-400 uppercase tracking-wide mb-1"
+            >Duration (min)</label
+          >
+          <input
+            id="edit-duration"
+            type="number"
+            min="1"
+            class="w-full border border-gray-200 dark:border-darkBorder bg-gray-50 dark:bg-darkBg dark:text-white rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-brand outline-none font-mono"
+          />
+        </div>
+        <div class="flex justify-end gap-2">
+          <button
+            onclick="closeEditModal()"
+            class="px-4 py-2 text-sm font-semibold text-gray-500 hover:bg-gray-100 dark:hover:bg-darkBorder rounded-lg transition"
+          >
+            Cancel
+          </button>
+          <button
+            onclick="saveEdit()"
+            class="px-6 py-2 text-sm font-bold bg-brand text-white hover:bg-brandHover rounded-lg shadow-lg shadow-blue-200/50 transition"
+          >
+            Save
+          </button>
+        </div>
+      </div>
     </div>
 
     <!-- Settings Modal -->
-    <div id="settings-modal" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-[2000] hidden flex items-center justify-center">
-        <div class="bg-white dark:bg-darkSurface rounded-2xl shadow-2xl p-6 w-80">
-            <h3 class="text-lg font-bold mb-4 text-gray-800 dark:text-white flex items-center gap-2">
-                <i class="fa-solid fa-gear text-gray-400"></i> Settings
-            </h3>
-            <div class="flex items-center justify-between mb-6">
-                <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Dark Mode</span>
-                <button onclick="toggleDarkMode()" id="dark-mode-toggle" class="w-12 h-6 rounded-full bg-gray-200 dark:bg-brand relative transition-colors duration-300">
-                    <div class="w-4 h-4 rounded-full bg-white absolute top-1 left-1 dark:left-7 transition-all duration-300 shadow-sm"></div>
-                </button>
-            </div>
-            <div class="mb-6">
-                <span class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Accent Color</span>
-                <div class="flex gap-3 justify-center">
-                    <button onclick="setTheme('blue')" class="w-8 h-8 rounded-full bg-blue-500 hover:scale-110 transition ring-2 ring-offset-2 ring-transparent focus:ring-blue-300"></button>
-                    <button onclick="setTheme('purple')" class="w-8 h-8 rounded-full bg-purple-500 hover:scale-110 transition ring-2 ring-offset-2 ring-transparent focus:ring-purple-300"></button>
-                    <button onclick="setTheme('orange')" class="w-8 h-8 rounded-full bg-orange-500 hover:scale-110 transition ring-2 ring-offset-2 ring-transparent focus:ring-orange-300"></button>
-                    <button onclick="setTheme('green')" class="w-8 h-8 rounded-full bg-green-500 hover:scale-110 transition ring-2 ring-offset-2 ring-transparent focus:ring-green-300"></button>
-                </div>
-            </div>
-            <div class="flex justify-end">
-                <button onclick="document.getElementById('settings-modal').classList.add('hidden')" class="px-4 py-2 text-sm font-bold bg-gray-100 dark:bg-darkBorder text-gray-600 dark:text-white rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition">Done</button>
-            </div>
+    <div
+      id="settings-modal"
+      class="fixed inset-0 bg-black/40 backdrop-blur-sm z-[2000] hidden flex items-center justify-center"
+    >
+      <div class="bg-white dark:bg-darkSurface rounded-2xl shadow-2xl p-6 w-80">
+        <h3
+          class="text-lg font-bold mb-4 text-gray-800 dark:text-white flex items-center gap-2"
+        >
+          <i class="fa-solid fa-gear text-gray-400"></i> Settings
+        </h3>
+        <div class="flex items-center justify-between mb-6">
+          <span class="text-sm font-medium text-gray-700 dark:text-gray-300"
+            >Dark Mode</span
+          >
+          <button
+            onclick="toggleDarkMode()"
+            id="dark-mode-toggle"
+            class="w-12 h-6 rounded-full bg-gray-200 dark:bg-brand relative transition-colors duration-300"
+          >
+            <div
+              class="w-4 h-4 rounded-full bg-white absolute top-1 left-1 dark:left-7 transition-all duration-300 shadow-sm"
+            ></div>
+          </button>
         </div>
+        <div class="mb-6">
+          <span
+            class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3"
+            >Accent Color</span
+          >
+          <div class="flex gap-3 justify-center">
+            <button
+              onclick="setTheme('blue')"
+              class="w-8 h-8 rounded-full bg-blue-500 hover:scale-110 transition ring-2 ring-offset-2 ring-transparent focus:ring-blue-300"
+            ></button>
+            <button
+              onclick="setTheme('purple')"
+              class="w-8 h-8 rounded-full bg-purple-500 hover:scale-110 transition ring-2 ring-offset-2 ring-transparent focus:ring-purple-300"
+            ></button>
+            <button
+              onclick="setTheme('orange')"
+              class="w-8 h-8 rounded-full bg-orange-500 hover:scale-110 transition ring-2 ring-offset-2 ring-transparent focus:ring-orange-300"
+            ></button>
+            <button
+              onclick="setTheme('green')"
+              class="w-8 h-8 rounded-full bg-green-500 hover:scale-110 transition ring-2 ring-offset-2 ring-transparent focus:ring-green-300"
+            ></button>
+          </div>
+        </div>
+        <div class="flex justify-end">
+          <button
+            onclick="
+              document.getElementById('settings-modal').classList.add('hidden')
+            "
+            class="px-4 py-2 text-sm font-bold bg-gray-100 dark:bg-darkBorder text-gray-600 dark:text-white rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition"
+          >
+            Done
+          </button>
+        </div>
+      </div>
     </div>
-    
+
     <!-- Delete Modal -->
-    <div id="delete-modal" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-[2000] hidden flex items-center justify-center">
-        <div class="bg-white dark:bg-darkSurface rounded-2xl shadow-2xl p-6 w-80">
-            <h3 class="text-lg font-bold mb-4 text-red-600 flex items-center gap-2">
-                <i class="fa-solid fa-triangle-exclamation"></i> Delete Task?
-            </h3>
-            <p class="text-gray-600 dark:text-gray-400 text-sm mb-6">Are you sure you want to remove this task? This action cannot be undone.</p>
-            <div class="flex justify-end gap-2">
-                <button onclick="closeDeleteModal()" class="px-4 py-2 text-sm font-semibold text-gray-500 hover:bg-gray-100 dark:hover:bg-darkBorder rounded-lg transition">Cancel</button>
-                <button onclick="confirmDelete()" class="px-6 py-2 text-sm font-bold bg-red-500 text-white hover:bg-red-600 rounded-lg shadow-lg shadow-red-200/50 transition">Delete</button>
-            </div>
+    <div
+      id="delete-modal"
+      class="fixed inset-0 bg-black/40 backdrop-blur-sm z-[2000] hidden flex items-center justify-center"
+    >
+      <div class="bg-white dark:bg-darkSurface rounded-2xl shadow-2xl p-6 w-80">
+        <h3 class="text-lg font-bold mb-4 text-red-600 flex items-center gap-2">
+          <i class="fa-solid fa-triangle-exclamation"></i> Delete Task?
+        </h3>
+        <p class="text-gray-600 dark:text-gray-400 text-sm mb-6">
+          Are you sure you want to remove this task? This action cannot be
+          undone.
+        </p>
+        <div class="flex justify-end gap-2">
+          <button
+            onclick="closeDeleteModal()"
+            class="px-4 py-2 text-sm font-semibold text-gray-500 hover:bg-gray-100 dark:hover:bg-darkBorder rounded-lg transition"
+          >
+            Cancel
+          </button>
+          <button
+            onclick="confirmDelete()"
+            class="px-6 py-2 text-sm font-bold bg-red-500 text-white hover:bg-red-600 rounded-lg shadow-lg shadow-red-200/50 transition"
+          >
+            Delete
+          </button>
         </div>
+      </div>
     </div>
-    
+
     <!-- Finish Modal -->
-    <div id="finish-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[2000] hidden flex items-center justify-center">
-        <div class="bg-white dark:bg-darkSurface rounded-2xl shadow-2xl p-8 w-96 text-center transform transition-all scale-100">
-            <div class="mb-6 inline-flex items-center justify-center w-24 h-24 rounded-full bg-brandLight text-brand animate-bounce">
-                <i class="fa-solid fa-trophy text-5xl"></i>
-            </div>
-            <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-2 font-display">Puzzle Completed!</h2>
-            <p class="text-gray-500 dark:text-gray-400 mb-8">You've successfully connected all the pieces of your day.</p>
-            <button onclick="document.getElementById('finish-modal').classList.add('hidden')" class="w-full bg-brand hover:bg-brandHover text-white font-bold py-3 rounded-xl shadow-lg transition">
-                Awesome!
-            </button>
+    <div
+      id="finish-modal"
+      class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[2000] hidden flex items-center justify-center"
+    >
+      <div
+        class="bg-white dark:bg-darkSurface rounded-2xl shadow-2xl p-8 w-96 text-center transform transition-all scale-100"
+      >
+        <div
+          class="mb-6 inline-flex items-center justify-center w-24 h-24 rounded-full bg-brandLight text-brand animate-bounce"
+        >
+          <i class="fa-solid fa-trophy text-5xl"></i>
         </div>
+        <h2
+          class="text-2xl font-bold text-gray-800 dark:text-white mb-2 font-display"
+        >
+          Puzzle Completed!
+        </h2>
+        <p class="text-gray-500 dark:text-gray-400 mb-8">
+          You've successfully connected all the pieces of your day.
+        </p>
+        <button
+          onclick="
+            document.getElementById('finish-modal').classList.add('hidden')
+          "
+          class="w-full bg-brand hover:bg-brandHover text-white font-bold py-3 rounded-xl shadow-lg transition"
+        >
+          Awesome!
+        </button>
+      </div>
     </div>
 
     <!-- Audio -->
-    <audio id="timer-sound" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3"></audio>
+    <audio
+      id="timer-sound"
+      src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3"
+    ></audio>
 
     <!-- Main Logic -->
     <script src="script.js"></script>
-</body>
+  </body>
 </html>
