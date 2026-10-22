@@ -68,7 +68,8 @@ h1 {
 /* ---- WHEEL ---- */
 .wheel-section { display: flex; flex-direction: column; align-items: center; gap: 22px; position: sticky; top: 16px; }
 @media (max-width: 920px) { .wheel-section { position: static; } }
-.wheel-container { position: relative; width: min(500px, 84vw); aspect-ratio: 1; margin-top: 18px; filter: drop-shadow(0 0 40px rgba(124, 58, 237, 0.45)); }
+/* 5% smaller than before (500px / 84vw); margin-bottom keeps the 16px outer ring clear of the button */
+.wheel-container { position: relative; width: min(475px, 80vw); aspect-ratio: 1; margin-top: 18px; margin-bottom: 16px; filter: drop-shadow(0 0 40px rgba(124, 58, 237, 0.45)); }
 .wheel-outer-ring {
   position: absolute; inset: -16px; border-radius: 50%; border: 2px solid transparent;
   background: linear-gradient(var(--deep), var(--deep)) padding-box, linear-gradient(135deg, var(--gold), var(--purple-mid), var(--lavender), var(--gold)) border-box;
