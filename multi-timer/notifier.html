@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Notifier · Multi Timer</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔔</text></svg>" />
+    <script>
+      (function () {
+        var d = document.documentElement;
+        if (localStorage.theme === "dark" || (!("theme" in localStorage) && window.matchMedia("(prefers-color-scheme: dark)").matches)) d.classList.add("dark");
+        var c = localStorage.getItem("colorTheme");
+        if (c && c !== "purple") d.setAttribute("data-theme", c);
+      })();
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="style.css" />
+    <style>
+      body { margin: 0; min-height: 100vh; }
+      .nt-wrap { max-width: 420px; margin: 0 auto; padding: 20px 16px 28px; display: flex; flex-direction: column; gap: 14px; }
+      .nt-head { display: flex; align-items: center; gap: 12px; }
+      .nt-logo { width: 44px; height: 44px; border-radius: 14px; background: var(--brand-light); color: var(--brand-color); display: flex; align-items: center; justify-content: center; font-size: 1.25rem; }
+      .dark .nt-logo { background: #374151; }
+      .nt-title { font-family: "Fredoka", sans-serif; font-weight: 600; font-size: 1.15rem; }
+      .nt-status { padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; }
+      .nt-line { display: flex; align-items: center; gap: 10px; font-size: .9rem; }
+      .nt-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; background: #9ca3af; }
+      .nt-dot.ok { background: #22c55e; box-shadow: 0 0 0 4px rgba(34,197,94,.18); }
+      .nt-dot.warn { background: #f59e0b; }
+      .nt-dot.bad { background: #ef4444; }
+      .nt-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+      .nt-actions .mt-btn { flex: 1; }
+      .nt-item { display: flex; align-items: center; gap: 10px; padding: 11px 16px; border-bottom: 1px solid var(--border); font-size: .9rem; }
+      .nt-item:last-child { border-bottom: none; }
+      .nt-swatch { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+      .nt-in { font-variant-numeric: tabular-nums; font-weight: 600; }
+    </style>
+  </head>
+  <body>
+    <div class="nt-wrap">
+      <div class="nt-head">
+        <div class="nt-logo"><i class="fa-solid fa-bell"></i></div>
+        <div><div class="nt-title">Multi Timer notifier</div><div class="mt-sub">Sends desktop notifications for your Notion widget</div></div>
+      </div>
+      <div class="mt-card nt-status">
+        <div class="nt-line"><span class="nt-dot" id="nt-perm-dot"></span><span id="nt-perm"></span></div>
+        <div class="nt-line"><span class="nt-dot" id="nt-conn-dot"></span><span id="nt-conn"></span></div>
+      </div>
+      <div class="nt-actions">
+        <button class="mt-btn mt-btn-primary" id="nt-allow"><i class="fa-solid fa-bell mr-1"></i>&nbsp;Allow notifications</button>
+        <button class="mt-btn mt-btn-soft" id="nt-test">Send test</button>
+      </div>
+      <div>
+        <div class="mt-section-title">Upcoming</div>
+        <div class="mt-card" id="nt-list"></div>
+      </div>
+      <p class="mt-sub">Keep this window open — minimizing it is fine. Closing it stops desktop notifications from the Notion embed. Your timers stay in Notion.</p>
+    </div>
+    <script src="js/util.js"></script>
+    <script src="js/notify.js"></script>
+    <script src="js/notifier.js"></script>
+  </body>
+</html>

@@ -213,7 +213,7 @@ window.MT = window.MT || {};
       rt.status = "completed";
       rt.finishedAt = now;
       S.logHistory(el, { start: rt.runStart, end: now, dur: now - rt.runStart, label: `Reached ${final}`, kind: "finish" });
-      E.onAlarm(el, {});
+      E.onAlarm(el, { at: now });
     } else {
       rt.status = next === initial ? "inactive" : "running";
       if (rt.status === "inactive") rt.runStart = null;
@@ -249,7 +249,7 @@ window.MT = window.MT || {};
       rt.segIndex = ni;
       rt.cycle = nc;
       const next = E.seg(el, ni);
-      E.onAlarm(el, { silent, short: true, label: next.name });
+      E.onAlarm(el, { silent, short: true, label: next.name, at: end });
       if (el.pauseBetween) {
         rt.status = "waiting";
         rt.remaining = next.dur;
@@ -260,7 +260,7 @@ window.MT = window.MT || {};
       } else beginSeg(el, end);
       return;
     }
-    E.onAlarm(el, { silent });
+    E.onAlarm(el, { silent, at: end });
     if (el.autoRepeat) {
       rt.segIndex = 0;
       rt.cycle = 0;
@@ -301,13 +301,36 @@ window.MT = window.MT || {};
       el.milestones.forEach((m) => {
         if (m > 0 && elapsed >= m && !rt.fired.includes(m)) {
           rt.fired.push(m);
-          E.onAlarm(el, { short: true, label: "Milestone " + MT.util.fmtHuman(m), silent: elapsed - m > 10000 });
+          E.onAlarm(el, { short: true, label: "Milestone " + MT.util.fmtHuman(m), silent: elapsed - m > 10000, at: E.milestoneAt(el, m) });
           changed = true;
         }
       });
     }
     if (changed) E.changed(el, true);
     return changed;
+  };
+
+  /** Wall-clock time a count-up milestone is reached (stable while running). */
+  E.milestoneAt = (el, m) => (el.rt.activeSince || Date.now()) + m - (el.rt.acc || 0);
+
+  /** Upcoming alarms of running timers, for the notifier window. */
+  E.upcoming = (now) => {
+    const out = [];
+    S.allElements().forEach(({ el, board }) => {
+      const rt = el.rt;
+      if (!rt || rt.status !== "running") return;
+      if (E.isSegmented(el)) {
+        const n = E.segments(el).length;
+        let ni = rt.segIndex + 1, nc = rt.cycle || 0;
+        if (ni >= n) { ni = 0; nc++; }
+        const final = ni === 0 && nc >= E.cycles(el);
+        out.push({ id: el.id, at: rt.endsAt, final, label: final ? "" : E.seg(el, ni).name, board: board.name });
+      } else if (el.type === "countup" && el.milestones && el.milestones.length) {
+        const m = el.milestones.find((x) => x > 0 && !(rt.fired || []).includes(x));
+        if (m) out.push({ id: el.id, at: E.milestoneAt(el, m), final: false, label: "Milestone " + MT.util.fmtHuman(m), board: board.name });
+      }
+    });
+    return out.filter((x) => x.at > now - 1000);
   };
 
   E.tickAll = (now) => {
@@ -330,7 +353,8 @@ window.MT = window.MT || {};
 
   /* ---------- ringing registry (filled by app alarm handler) ---------- */
   E.ringing = new Map();
-  E.stopRinging = (id) => {
+  E.stopRinging = (id, { keepNotification = false } = {}) => {
+    if (!keepNotification && MT.notify) MT.notify.clear(id);
     const r = E.ringing.get(id);
     if (r) {
       try { r.sound && r.sound.stop(); } catch (e) {}
