@@ -29,6 +29,36 @@
   --hub-in: #43207a;
   --hub-out: #22104a;
 }
+:root[data-sky="dusk"] {
+  --sky: linear-gradient(180deg, #a690e8 0%, #9178dc 45%, #7a5ec9 100%);
+  --sky-glow-a: rgba(255, 255, 255, 0.26);
+  --sky-glow-b: rgba(245, 227, 163, 0.14);
+  --surface: rgba(58, 26, 120, 0.66);
+  --surface-head: linear-gradient(135deg, rgba(109, 40, 217, 0.8), rgba(167, 139, 250, 0.35));
+  --surface-hi: linear-gradient(135deg, rgba(91, 33, 182, 0.93), rgba(59, 22, 120, 0.95));
+  --field: rgba(36, 12, 82, 0.45);
+  --item: rgba(76, 32, 150, 0.5);
+  --item-hover: rgba(109, 40, 217, 0.55);
+  --ring: #3b1d6e;
+  --overlay: rgba(48, 18, 100, 0.55);
+  --hub-in: #5b2fa6;
+  --hub-out: #2e1468;
+}
+:root[data-sky="dawn"] {
+  --sky: linear-gradient(180deg, #f6f2ff 0%, #ece4ff 50%, #ddd0fb 100%);
+  --sky-glow-a: rgba(255, 255, 255, 0.7);
+  --sky-glow-b: rgba(196, 181, 253, 0.35);
+  --surface: rgba(255, 255, 255, 0.8);
+  --surface-head: linear-gradient(135deg, rgba(237, 233, 254, 0.98), rgba(221, 214, 254, 0.8));
+  --surface-hi: linear-gradient(135deg, #5b21b6, #3b1478);
+  --field: rgba(255, 255, 255, 0.88);
+  --item: rgba(250, 247, 255, 0.96);
+  --item-hover: #f1eaff;
+  --ring: #3b1d6e;
+  --overlay: rgba(59, 29, 110, 0.45);
+  --hub-in: #4c1d95;
+  --hub-out: #2a1254;
+}
 :root[data-sky="midnight"] {
   --sky: #06000e;
   --sky-glow-a: rgba(91, 33, 182, 0.22);
@@ -370,6 +400,52 @@ body.cheer .sorcerer .k-hat { animation: k-hatpop 0.45s ease-out 3; }
 }
 
 /* sky switch (Rules card) */
-.sky-switch { display: flex; gap: 6px; margin-top: 4px; }
+.sky-switch { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 4px; }
 .sky-switch button { flex: 1; padding: 7px 10px; border-radius: 8px; border: 1px solid rgba(167, 139, 250, 0.35); background: var(--field); color: var(--lilac); font-family: "Cinzel", serif; font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; }
 .sky-switch button.on { background: linear-gradient(135deg, var(--purple), var(--purple-mid)); border-color: var(--gold); color: var(--white); }
+
+/* ---------- Dusk: brighter text sitting directly on the lavender sky ---------- */
+:root[data-sky="dusk"] h1 { filter: drop-shadow(0 2px 8px rgba(30, 8, 70, 0.55)); }
+:root[data-sky="dusk"] .subtitle { color: #fff; opacity: 0.92; text-shadow: 0 1px 6px rgba(30, 8, 70, 0.5); }
+:root[data-sky="dusk"] .pool-info { color: #fff; text-shadow: 0 1px 4px rgba(30, 8, 70, 0.55); }
+:root[data-sky="dusk"] .pool-info b, :root[data-sky="dusk"] .link-btn { color: var(--gold-light); }
+:root[data-sky="dusk"] .spin-hint { color: #fff5cc; opacity: 0.95; text-shadow: 0 1px 4px rgba(30, 8, 70, 0.55); }
+:root[data-sky="dusk"] .k-floater { opacity: 0.5; }
+
+/* ---------- Dawn: light theme (wheel, fate card, dialogs and kitties keep their night colors) ---------- */
+:root[data-sky="dawn"] body { color: #2e1065; }
+:root[data-sky="dawn"] h1 { background: linear-gradient(135deg, #b8860b 0%, #6d28d9 40%, #a16207 72%, #9333ea 100%); -webkit-background-clip: text; background-clip: text; filter: drop-shadow(0 2px 10px rgba(167, 139, 250, 0.45)); }
+:root[data-sky="dawn"] .subtitle { color: #6d28d9; opacity: 0.85; }
+:root[data-sky="dawn"] .ornament-line { background: linear-gradient(90deg, transparent, #7c3aed, transparent); }
+:root[data-sky="dawn"] .home-link { color: #5b21b6; background: rgba(255, 255, 255, 0.85); border-color: rgba(124, 58, 237, 0.35); }
+:root[data-sky="dawn"] .pool-info { color: #4c1d95; }
+:root[data-sky="dawn"] .pool-info b, :root[data-sky="dawn"] .link-btn, :root[data-sky="dawn"] .spin-hint { color: #a16207; }
+:root[data-sky="dawn"] .spin-hint { opacity: 0.9; }
+:root[data-sky="dawn"] .star { background: #a78bfa; }
+:root[data-sky="dawn"] .star:nth-child(3n) { background: #e2b84a; }
+:root[data-sky="dawn"] .k-floater { opacity: 0.55; }
+:root[data-sky="dawn"] .select option { background: #fff; color: #2e1065; }
+:root[data-sky="dawn"] .panel-card { border-color: rgba(167, 139, 250, 0.55); box-shadow: 0 6px 24px rgba(91, 33, 182, 0.15); }
+:root[data-sky="dawn"] .panel-header { border-bottom-color: rgba(167, 139, 250, 0.4); }
+:root[data-sky="dawn"] .panel .panel-title { color: #4c1d95; }
+:root[data-sky="dawn"] .panel label { color: #6d28d9; }
+:root[data-sky="dawn"] .panel .toggle-row, :root[data-sky="dawn"] .panel .task-name, :root[data-sky="dawn"] .panel .hist-name { color: #3b1d6e; }
+:root[data-sky="dawn"] .panel .hint, :root[data-sky="dawn"] .panel .empty-state, :root[data-sky="dawn"] .panel .task-details,
+:root[data-sky="dawn"] .panel .hist-when, :root[data-sky="dawn"] .panel .howto { color: rgba(76, 29, 149, 0.72); }
+:root[data-sky="dawn"] .panel .howto summary, :root[data-sky="dawn"] .panel .hist-icon { color: #a16207; }
+:root[data-sky="dawn"] .panel .howto code { background: rgba(167, 139, 250, 0.2); }
+:root[data-sky="dawn"] .panel .csv-hint, :root[data-sky="dawn"] .panel .tab-btn { color: #5b21b6; }
+:root[data-sky="dawn"] .panel .csv-drop { border-color: rgba(139, 92, 246, 0.5); }
+:root[data-sky="dawn"] .panel .ghost-btn, :root[data-sky="dawn"] .panel .sky-switch button { color: #4c1d95; border-color: rgba(139, 92, 246, 0.4); }
+:root[data-sky="dawn"] .panel .ghost-btn:hover { color: #a16207; border-color: #c9a227; }
+:root[data-sky="dawn"] .panel input[type="text"], :root[data-sky="dawn"] .panel textarea, :root[data-sky="dawn"] .panel .select, :root[data-sky="dawn"] .panel .search { color: #2e1065; border-color: rgba(139, 92, 246, 0.45); }
+:root[data-sky="dawn"] .panel input::placeholder, :root[data-sky="dawn"] .panel textarea::placeholder { color: rgba(91, 33, 182, 0.45); }
+:root[data-sky="dawn"] .panel .chip { color: #4c1d95; background: rgba(237, 233, 254, 0.95); border-color: rgba(139, 92, 246, 0.35); }
+:root[data-sky="dawn"] .panel .tab-btn.active, :root[data-sky="dawn"] .panel .chip.on, :root[data-sky="dawn"] .panel .sky-switch button.on { color: #fff; }
+:root[data-sky="dawn"] .panel .task-item { border-color: rgba(167, 139, 250, 0.4); }
+:root[data-sky="dawn"] .panel .delete-btn { color: rgba(91, 33, 182, 0.45); }
+:root[data-sky="dawn"] .panel .hist-row { border-bottom-color: rgba(167, 139, 250, 0.3); }
+:root[data-sky="dawn"] .panel .clear-btn { color: rgba(220, 38, 38, 0.8); border-color: rgba(220, 38, 38, 0.35); }
+:root[data-sky="dawn"] .result-card .act-btn { background: rgba(26, 9, 56, 0.45); }
+:root[data-sky="dawn"] .result-card .act-btn.primary { background: linear-gradient(135deg, #b8860b, var(--gold)); }
+:root[data-sky="dawn"] .modal .toggle-row input, :root[data-sky="dawn"] .modal { color: var(--lilac); }
