@@ -10,7 +10,9 @@ window.MT = window.MT || {};
     doubleTapReset: true,
     quickNamePrompt: false,
     volume: 0.8,
-    statusNotifications: false,
+    desktopNotifications: false,
+    titleStatus: false,
+    notifPromptDismissed: false,
     fullScreenAlert: true,
     waitingAnimation: true,
     keepHistory: "forever", // forever | 1y | 6m | 3m | 1m | 1w
@@ -91,7 +93,13 @@ window.MT = window.MT || {};
       const b = S.createBoard("Timers");
       st = { version: 1, boards: [b], activeBoardId: b.id };
     }
-    st.settings = { ...DEFAULT_SETTINGS, ...(st.settings || {}) };
+    const old = st.settings || {};
+    if (old.statusNotifications !== undefined && old.titleStatus === undefined) {
+      // split the old combined setting into desktop notifications + tab-title countdown
+      old.titleStatus = old.desktopNotifications = !!old.statusNotifications;
+    }
+    delete old.statusNotifications;
+    st.settings = { ...DEFAULT_SETTINGS, ...old };
     st.history = Array.isArray(st.history) ? st.history : [];
     st.trash = Array.isArray(st.trash) ? st.trash : [];
     st.customColors = Array.isArray(st.customColors) ? st.customColors : [];

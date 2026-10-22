@@ -214,6 +214,11 @@ window.MT = window.MT || {};
       case "settings-back": MT.settings.back(); break;
       case "sound-add": MT.settings.addSound(); break;
       case "single-back": A.go("board"); break;
+      case "notif-enable":
+        S.state.settings.notifPromptDismissed = true;
+        MT.notify.enable().then(() => A.render());
+        break;
+      case "notif-dismiss": S.state.settings.notifPromptDismissed = true; S.save(); A.render(); break;
       case "single-menu": {
         const f = S.find(A.singleId);
         if (f) B.elementMenu(f.el.id, btn.getBoundingClientRect().right - 220, btn.getBoundingClientRect().bottom + 4);
@@ -328,10 +333,10 @@ window.MT = window.MT || {};
     const a = el.alert || {};
     const sound = a.sound || st.defaultSound;
     const label = S.elementLabel(el);
-    E.stopRinging(el.id);
+    E.stopRinging(el.id, { keepNotification: true }); // only silences the previous sound
     const handle = MT.sounds.play(sound, { volume: st.volume, repeat: opts.short ? 1 : a.repeat ?? 1 });
     if (a.vibrate) MT.sounds.vibrate(opts.short ? [200] : [400, 200, 400, 200, 400]);
-    MT.settings.notify(label, opts.label ? `Next: ${opts.label}` : "Time is up");
+    MT.notify.alarm(el, opts);
     if (opts.short) {
       UI.toast(`${label}: ${opts.label || "next"}`);
       E.ringing.set(el.id, { sound: handle, short: true });
@@ -389,7 +394,7 @@ window.MT = window.MT || {};
 
   /* ---------- tick ---------- */
   function updateTitle(now) {
-    if (!S.state.settings.statusNotifications) return;
+    if (!S.state.settings.titleStatus) return;
     const running = S.allElements().map(({ el }) => el).filter((el) => E.isSegmented(el) && el.rt.status === "running").sort((a, b) => a.rt.endsAt - b.rt.endsAt)[0];
     const t = running ? `▶ ${U.plainTime(running.rt.endsAt - now)} ${S.elementLabel(running)} · Multi Timer` : A.baseTitle;
     if (document.title !== t) document.title = t;
@@ -423,7 +428,8 @@ window.MT = window.MT || {};
     MT.settings.applyTheme();
     S.load();
     E.onAlarm = A.alarm;
-    E.onChange = () => { A.queueRender(); MT.settings.updateWakeLock(); };
+    E.onChange = () => { A.queueRender(); MT.settings.updateWakeLock(); MT.notify.sendSchedule(); };
+    MT.notify.boot();
     // catch up timers that finished while the page was closed (silently: >10s late)
     E.tickAll(Date.now());
 
@@ -461,6 +467,9 @@ window.MT = window.MT || {};
 
     A.render();
     setInterval(tick, 100);
+    // worker-driven backup tick: keeps alarms on time when the tab is in the background
+    let beats = 0;
+    MT.notifyCore.ticker(() => { tick(); if (beats++ % 3 === 0) MT.notify.heartbeat(); }, 1000);
     MT.io.checkHashImport();
     MT.io.autoSync();
   };

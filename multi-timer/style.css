@@ -314,3 +314,6 @@ button.mt-list-row:hover { background: color-mix(in srgb, var(--brand-color) 6%,
 @media (prefers-reduced-motion: reduce) {
   .mt-ring.anim[data-status], .mt-grid.editing .mt-cell, .mt-alert-pulse { animation: none !important; }
 }
+
+/* notifications prompt */
+.mt-banner { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; background: var(--surface); border: 1px solid color-mix(in srgb, var(--brand-color) 35%, var(--border)); border-radius: 14px; padding: 10px 12px 10px 16px; margin-bottom: 12px; font-size: .88rem; box-shadow: 0 6px 18px -12px var(--brand-color); }

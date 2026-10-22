@@ -33,5 +33,10 @@ Use **Download Excel template** for a ready-made example. Each sheet becomes a b
 
 A Notion database exported as CSV imports as-is: `Category` becomes the board and `Time block` becomes the duration.
 
+## Desktop notifications
+Settings → Alert settings → **Desktop notifications** (or the banner on the board). Notifications stay on screen until you dismiss them and have **Stop** and **+1 min** buttons.
+- **Widget opened in its own tab:** the browser asks for permission once and the page shows the notifications itself.
+- **Widget embedded in Notion:** browsers don't let embeds show notifications, so turning them on opens a small **notifier window**. Allow notifications in it once, then keep it open (minimized is fine). The embed sends it the timers' end times, so notifications arrive on time even when the Notion tab is in the background. If you close it, use **Reopen window** in Alert settings.
+
 ## Browser limits
-Alarms only ring while the page (or the Notion page that embeds it) is open. Timers are based on the clock, so a timer that finishes while the page is closed shows its overtime when you reopen it. Vibration works only in Android browsers. Keeping the screen on needs a browser that supports the Screen Wake Lock API.
+Alarms and notifications only work while the page (or the Notion page that embeds it) is open. Timers are based on the clock, so a timer that finishes while the page is closed shows its overtime when you reopen it. Vibration works only in Android browsers. Keeping the screen on needs a browser that supports the Screen Wake Lock API.

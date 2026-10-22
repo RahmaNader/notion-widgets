@@ -42,9 +42,24 @@ window.MT = window.MT || {};
   };
 
   /* ---------- notifications ---------- */
-  ST.notify = (title, body) => {
-    if (!set().statusNotifications || !("Notification" in window) || Notification.permission !== "granted") return;
-    try { new Notification(title, { body, tag: "multi-timer-" + title, renotify: true }); } catch (e) {}
+  /** Desktop-notification row for Alert settings. */
+  const notifRow = () => {
+    const s = MT.notify.state();
+    const btn = (st, label, kind = "soft") => `<button class="mt-btn mt-btn-${kind}" data-st="${st}">${label}</button>`;
+    const map = {
+      off: ["Off", btn("notif-on", "Turn on", "primary")],
+      on: ["On — you'll get a desktop notification when a timer ends", btn("notif-test", "Test") + btn("notif-off", "Turn off", "ghost")],
+      blocked: ["Blocked by the browser. Click the lock icon in the address bar → Notifications → Allow, then reload.", ""],
+      unsupported: ["This browser doesn't support notifications", ""],
+      relay: ["On — sent through the notifier window. Keep it open (minimized is fine).", btn("notif-test", "Test") + btn("notif-off", "Turn off", "ghost")],
+      "relay-permission": ["Almost there — click “Allow notifications” in the notifier window", btn("notif-reopen", "Show window", "primary") + btn("notif-off", "Turn off", "ghost")],
+      "relay-closed": ["The notifier window is closed, so notifications are paused", btn("notif-reopen", "Reopen window", "primary") + btn("notif-off", "Turn off", "ghost")],
+    };
+    const [sub, buttons] = map[s];
+    const embed = MT.notify.crossOriginFrame()
+      ? `<span class="mt-sub block mt-1">Inside Notion, browsers don't let embeds show notifications, so a small notifier window sends them for this widget.</span>` : "";
+    return `<div class="mt-list-row flex-wrap gap-2"><span class="flex-1 min-w-[180px]"><span class="block font-medium">Desktop notifications</span>
+      <span class="mt-sub block">${sub}</span>${embed}</span><span class="flex gap-2">${buttons}</span></div>`;
   };
 
   /* ---------- pages ---------- */
@@ -111,10 +126,9 @@ window.MT = window.MT || {};
         h = card(`<div class="p-4 border-b border-gray-100 dark:border-darkBorder"><div class="font-medium mb-2">Audio volume</div>
             <div class="flex items-center gap-3"><i class="fa-solid fa-volume-low text-gray-400"></i><input type="range" min="0" max="1" step="0.05" value="${set().volume}" id="st-volume" class="flex-1 accent-[var(--brand-color)]"/><i class="fa-solid fa-volume-high text-gray-400"></i></div>
             <div class="flex gap-2 mt-3"><button class="mt-btn mt-btn-soft" data-st="vol-test"><i class="fa-solid fa-play mr-1"></i>Test</button><button class="mt-btn mt-btn-ghost" data-st="vol-reset">Reset</button></div></div>` +
-          toggle("Show status notifications", "Browser notifications when a timer ends, plus the running timer's countdown in the tab title.", "statusNotifications") +
+          notifRow() +
+          toggle("Show countdown in tab title", "The next timer to finish is shown in the browser tab title.", "titleStatus") +
           toggle("Show full-screen alert", "A full-screen alert with stop, snooze and reset buttons when a timer ends.", "fullScreenAlert"));
-        if ("Notification" in window && Notification.permission === "denied")
-          h += `<p class="mt-sub px-1">Notifications are blocked for this site in your browser settings.</p>`;
         h += `<p class="mt-sub px-1">Alerts play while this page (or the Notion page embedding it) is open.</p>`;
         break;
       case "sounds": {
@@ -212,6 +226,10 @@ window.MT = window.MT || {};
     switch (st.dataset.st) {
       case "vol-test": preview && preview.stop(); preview = MT.sounds.play(set().defaultSound, { repeat: 1 }); break;
       case "vol-reset": set().volume = 0.8; S.save(); A().render(); break;
+      case "notif-on": await MT.notify.enable(); A().render(); break;
+      case "notif-off": MT.notify.disable(); A().render(); break;
+      case "notif-test": MT.notify.test(); break;
+      case "notif-reopen": MT.notify.openNotifier(); break;
       case "open-history": MT.history.open(); break;
       case "clear-history":
         if (await UI.confirm("Delete all history records?", { okLabel: "Delete", danger: true })) { S.state.history = []; S.save(); A().render(); }
@@ -242,11 +260,7 @@ window.MT = window.MT || {};
       const k = t.dataset.setting;
       set()[k] = t.checked;
       S.save();
-      if (k === "statusNotifications" && t.checked && "Notification" in window && Notification.permission === "default") {
-        const p = await Notification.requestPermission();
-        if (p !== "granted") UI.toast("Notifications were not allowed — tab title updates still work", "error");
-      }
-      if (k === "statusNotifications" && !t.checked) document.title = A().baseTitle;
+      if (k === "titleStatus" && !t.checked) document.title = A().baseTitle;
       if (k === "waitingAnimation") A().render();
     }
   };

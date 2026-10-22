@@ -48,7 +48,13 @@ window.MT = window.MT || {};
             <button class="mt-btn mt-btn-ghost" data-h="template"><i class="fa-solid fa-download mr-1"></i>Template</button>
           </div>
         </div></div>`;
-    return `<div class="p-3 sm:p-6 max-w-6xl mx-auto">${tabs}
+    const banner = MT.notify && MT.notify.shouldPrompt()
+      ? `<div class="mt-banner"><i class="fa-solid fa-bell text-brand"></i>
+          <span class="flex-1 min-w-0">Get a desktop notification when a timer finishes.</span>
+          <button class="mt-btn mt-btn-primary" data-h="notif-enable">Turn on</button>
+          <button class="mt-btn mt-btn-ghost" data-h="notif-dismiss">Not now</button></div>`
+      : "";
+    return `<div class="p-3 sm:p-6 max-w-6xl mx-auto">${tabs}${banner}
       <div class="mt-grid ${A().editMode ? "editing" : ""}" id="mt-grid" style="${R.gridStyle(b)}">
         ${b.elements.map((el) => R.cell(el, now, A().editMode)).join("")}
       </div></div>`;
