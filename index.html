@@ -233,6 +233,57 @@
           </div>
         </div>
 
+        <!-- 3. Prayer Times Widget (full row) -->
+        <div
+          class="md:col-span-2 lg:col-span-3 bg-white dark:bg-darkSurface p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-darkBorder relative overflow-hidden"
+        >
+          <div class="absolute top-0 right-0 p-4 opacity-10 pointer-events-none">
+            <i class="fa-solid fa-mosque text-8xl dark:text-gray-600"></i>
+          </div>
+          <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+            <h2 class="text-xl font-bold text-gray-800 dark:text-white">
+              <i class="fa-solid fa-mosque mr-2 text-brand"></i>Prayer Times
+            </h2>
+            <button
+              onclick="initPrayerTimes(true)"
+              class="text-xs text-gray-500 hover:text-brand transition"
+              title="Refresh Prayer Times"
+            >
+              <span id="prayer-hijri"></span>
+              <i class="fa-solid fa-location-dot ml-2 mr-1"></i>Cairo, Egypt
+            </button>
+          </div>
+
+          <!-- Next prayer countdown -->
+          <div
+            id="prayer-next"
+            class="mb-5 p-4 rounded-xl bg-brandLight dark:bg-gray-800/60 flex flex-wrap items-center justify-between gap-2"
+          >
+            <div class="text-sm text-gray-600 dark:text-gray-300">
+              Next:
+              <span id="prayer-next-name" class="font-bold text-gray-900 dark:text-white">--</span>
+              at
+              <span id="prayer-next-time" class="font-mono">--:--</span>
+            </div>
+            <div
+              id="prayer-countdown"
+              class="text-2xl font-mono font-bold text-brand tracking-wider"
+            >
+              --:--:--
+            </div>
+          </div>
+
+          <div
+            id="prayer-display"
+            class="grid grid-cols-3 sm:grid-cols-6 gap-2 text-center"
+          >
+            <div class="col-span-full py-6 text-gray-400 text-sm animate-pulse">
+              <i class="fa-solid fa-satellite-dish fa-spin mr-2"></i> Fetching
+              prayer times...
+            </div>
+          </div>
+        </div>
+
         <!-- Time Calculator -->
         <a
           href="./time-calculator/index.html"
@@ -432,6 +483,183 @@
 
       // Initialize weather on load
       initWeather();
+
+      /* --- Prayer Times Logic (AlAdhan API, Egyptian General Authority of Survey) --- */
+      const PRAYER_TZ = "Africa/Cairo";
+      const PRAYER_LAT = 29.9602;
+      const PRAYER_LON = 31.2569;
+      const PRAYER_METHOD = 5; // Egyptian General Authority of Survey
+      const PRAYERS = [
+        { name: "Fajr", icon: "fa-star-and-crescent" },
+        { name: "Sunrise", icon: "fa-sun", notPrayer: true },
+        { name: "Dhuhr", icon: "fa-sun" },
+        { name: "Asr", icon: "fa-cloud-sun" },
+        { name: "Maghrib", icon: "fa-moon" },
+        { name: "Isha", icon: "fa-star" },
+      ];
+      let prayerToday = null; // { date, hijri, times: {name: Date} }
+      let prayerTomorrow = null;
+
+      // Cairo calendar date as { y, m, d }, shifted by offsetDays
+      function getCairoDate(offsetDays = 0) {
+        const parts = new Intl.DateTimeFormat("en-CA", {
+          timeZone: PRAYER_TZ,
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit",
+        }).format(new Date()); // YYYY-MM-DD
+        const [y, m, d] = parts.split("-").map(Number);
+        const dt = new Date(Date.UTC(y, m - 1, d + offsetDays));
+        return {
+          y: dt.getUTCFullYear(),
+          m: dt.getUTCMonth() + 1,
+          d: dt.getUTCDate(),
+        };
+      }
+
+      function pad2(n) {
+        return String(n).padStart(2, "0");
+      }
+
+      async function fetchPrayerDay(offsetDays, force = false) {
+        const { y, m, d } = getCairoDate(offsetDays);
+        const key = `prayer-${y}-${pad2(m)}-${pad2(d)}`;
+        let raw = null;
+
+        if (!force) {
+          try {
+            raw = JSON.parse(localStorage.getItem(key));
+          } catch (e) {}
+        }
+
+        if (!raw) {
+          const url = `https://api.aladhan.com/v1/timings/${pad2(d)}-${pad2(m)}-${y}?latitude=${PRAYER_LAT}&longitude=${PRAYER_LON}&method=${PRAYER_METHOD}&iso8601=true`;
+          const res = await fetch(url);
+          if (!res.ok) throw new Error("Prayer API error " + res.status);
+          const json = await res.json();
+          const h = json.data.date.hijri;
+          raw = {
+            hijri: `${h.day} ${h.month.en} ${h.year} AH`,
+            timings: json.data.timings,
+          };
+          try {
+            localStorage.setItem(key, JSON.stringify(raw));
+          } catch (e) {}
+        }
+
+        const times = {};
+        PRAYERS.forEach((p) => (times[p.name] = new Date(raw.timings[p.name])));
+        return { key, hijri: raw.hijri, times };
+      }
+
+      async function initPrayerTimes(force = false) {
+        try {
+          prayerToday = await fetchPrayerDay(0, force);
+          prayerTomorrow = null;
+          // After Isha, the next prayer is tomorrow's Fajr
+          if (Date.now() >= prayerToday.times.Isha.getTime()) {
+            prayerTomorrow = await fetchPrayerDay(1, force);
+          }
+          renderPrayerTimes();
+          updatePrayerCountdown();
+        } catch (error) {
+          document.getElementById("prayer-display").innerHTML =
+            '<div class="col-span-full text-red-400 text-sm">Prayer times unavailable</div>';
+        }
+      }
+
+      function formatPrayerTime(date) {
+        return date.toLocaleTimeString("en-US", {
+          timeZone: PRAYER_TZ,
+          hour: "numeric",
+          minute: "2-digit",
+        });
+      }
+
+      function getNextPrayer() {
+        const now = Date.now();
+        for (const p of PRAYERS) {
+          if (p.notPrayer) continue;
+          if (prayerToday.times[p.name].getTime() > now)
+            return { name: p.name, time: prayerToday.times[p.name] };
+        }
+        if (prayerTomorrow)
+          return { name: "Fajr", time: prayerTomorrow.times.Fajr, tomorrow: true };
+        return null;
+      }
+
+      function renderPrayerTimes() {
+        if (!prayerToday) return;
+        const container = document.getElementById("prayer-display");
+        const next = getNextPrayer();
+        const now = Date.now();
+        document.getElementById("prayer-hijri").textContent = prayerToday.hijri;
+
+        container.innerHTML = PRAYERS.map((p) => {
+          const t = prayerToday.times[p.name];
+          const isNext = next && !next.tomorrow && next.name === p.name;
+          const isPast = t.getTime() <= now;
+          let cls =
+            "flex flex-col items-center p-3 rounded-xl transition border border-transparent";
+          if (isNext)
+            cls += " ring-2 ring-brand bg-brandLight dark:bg-gray-700/60";
+          else if (isPast) cls += " opacity-50";
+          else cls += " hover:bg-gray-50 dark:hover:bg-gray-700/30";
+          return `
+            <div class="${cls}">
+              <span class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wide">${p.name}</span>
+              <i class="fa-solid ${p.icon} text-xl my-2 ${isNext ? "text-brand" : "text-gray-600 dark:text-gray-300"}"></i>
+              <span class="text-sm font-mono font-bold text-gray-900 dark:text-white">${formatPrayerTime(t)}</span>
+            </div>`;
+        }).join("");
+
+        if (next) {
+          document.getElementById("prayer-next-name").textContent =
+            next.name + (next.tomorrow ? " (tomorrow)" : "");
+          document.getElementById("prayer-next-time").textContent =
+            formatPrayerTime(next.time);
+        }
+      }
+
+      function updatePrayerCountdown() {
+        if (!prayerToday) return;
+        // Cairo date changed since last fetch -> load the new day
+        const { y, m, d } = getCairoDate(0);
+        if (prayerToday.key !== `prayer-${y}-${pad2(m)}-${pad2(d)}`) {
+          prayerToday = null;
+          initPrayerTimes();
+          return;
+        }
+
+        const next = getNextPrayer();
+        if (!next) {
+          // Passed Isha but tomorrow not loaded yet
+          prayerToday = null;
+          initPrayerTimes();
+          return;
+        }
+
+        const diff = next.time.getTime() - Date.now();
+        if (diff <= 0) {
+          renderPrayerTimes();
+          return;
+        }
+        const totalSec = Math.floor(diff / 1000);
+        const h = Math.floor(totalSec / 3600);
+        const m2 = Math.floor((totalSec % 3600) / 60);
+        const s = totalSec % 60;
+        document.getElementById("prayer-countdown").textContent =
+          `${h}h ${pad2(m2)}m ${pad2(s)}s`;
+
+        // Move the highlight once a prayer time passes
+        if (renderPrayerTimes.lastNext !== next.name) {
+          renderPrayerTimes.lastNext = next.name;
+          renderPrayerTimes();
+        }
+      }
+
+      initPrayerTimes();
+      setInterval(updatePrayerCountdown, 1000);
 
       /* --- Quick Scratchpad Logic --- */
       const scratchpad = document.getElementById("scratchpad");
