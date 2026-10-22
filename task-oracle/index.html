@@ -16,6 +16,7 @@
   </head>
   <body>
     <div class="stars" id="stars"></div>
+    <div class="kitty-sky" id="kittySky" aria-hidden="true"></div>
 
     <div class="app">
       <header>
@@ -23,6 +24,7 @@
         <div class="title-ornament"><div class="ornament-line"></div><div class="ornament-gem"></div><div class="ornament-line"></div></div>
         <h1>The Task Oracle</h1>
         <p class="subtitle">Spin &nbsp;·&nbsp; Discover &nbsp;·&nbsp; Conquer</p>
+        <div class="moon-kitty" id="kittyMoon" aria-hidden="true"></div>
       </header>
 
       <div class="main-grid">
@@ -42,12 +44,14 @@
             </div>
             <canvas id="wheel" width="500" height="500" aria-label="Task wheel"></canvas>
             <button class="wheel-center" id="wheelHub" title="Spin the wheel" aria-label="Spin the wheel"><span>SPIN<br />THE<br />WHEEL</span></button>
+            <div class="sorcerer sorcerer-left" id="kittyWand" title="The sorcerer cat will spin it for you"></div>
+            <div class="sorcerer sorcerer-right" id="kittyOrb" title="The seer cat will spin it for you"></div>
           </div>
 
-          <button class="spin-btn" id="spinBtn">✦ Reveal My Fate ✦</button>
           <div class="pool-info" id="poolInfo"></div>
 
           <div class="result-card" id="resultCard" aria-live="polite">
+            <div class="peek-kitty" id="kittyPeek" aria-hidden="true"></div>
             <div class="result-fate-label">✦ Your Fate Has Spoken ✦</div>
             <div class="result-task-name" id="resultName">—</div>
             <div class="result-meta" id="resultMeta"></div>
@@ -155,6 +159,7 @@
     <div class="toast" id="toast" role="status"></div>
 
     <script src="js/import.js"></script>
+    <script src="js/kitties.js"></script>
     <script src="js/app.js"></script>
   </body>
 </html>

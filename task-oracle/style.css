@@ -42,7 +42,7 @@ body::before {
 .star { position: absolute; background: white; border-radius: 50%; animation: twinkle var(--d, 3s) ease-in-out infinite var(--delay, 0s); }
 @keyframes twinkle { 0%, 100% { opacity: var(--min-op, 0.2); } 50% { opacity: 1; } }
 
-.app { position: relative; z-index: 1; display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: auto 1fr; min-height: 100vh; padding: 24px 20px 40px; gap: 32px; max-width: 1440px; margin: 0 auto; }
+.app { position: relative; z-index: 1; overflow-x: clip; display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: auto 1fr; min-height: 100vh; padding: 24px 20px 40px; gap: 32px; max-width: 1440px; margin: 0 auto; }
 
 header { text-align: center; padding: 16px 0 0; position: relative; }
 .home-link {
@@ -68,8 +68,8 @@ h1 {
 /* ---- WHEEL ---- */
 .wheel-section { display: flex; flex-direction: column; align-items: center; gap: 22px; position: sticky; top: 16px; }
 @media (max-width: 920px) { .wheel-section { position: static; } }
-/* 5% smaller than before (500px / 84vw); margin-bottom keeps the 16px outer ring clear of the button */
-.wheel-container { position: relative; width: min(475px, 80vw); aspect-ratio: 1; margin-top: 18px; margin-bottom: 16px; filter: drop-shadow(0 0 40px rgba(124, 58, 237, 0.45)); }
+/* margin-bottom keeps the 16px outer ring clear of the text below */
+.wheel-container { position: relative; width: min(513px, 86.4vw, 100%); aspect-ratio: 1; margin-top: 18px; margin-bottom: 16px; filter: drop-shadow(0 0 40px rgba(124, 58, 237, 0.45)); }
 .wheel-outer-ring {
   position: absolute; inset: -16px; border-radius: 50%; border: 2px solid transparent;
   background: linear-gradient(var(--deep), var(--deep)) padding-box, linear-gradient(135deg, var(--gold), var(--purple-mid), var(--lavender), var(--gold)) border-box;
@@ -85,17 +85,16 @@ canvas#wheel { position: relative; width: 100%; height: 100%; border-radius: 50%
   cursor: pointer; display: flex; align-items: center; justify-content: center; transition: transform 0.2s, box-shadow 0.2s;
 }
 .wheel-center:hover, .wheel-center:focus-visible { transform: translate(-50%, -50%) scale(1.1); outline: none; box-shadow: 0 0 0 4px var(--deep), 0 0 0 6px rgba(167, 139, 250, 0.6), 0 0 40px rgba(226, 201, 126, 0.9), inset 0 2px 4px rgba(255, 255, 255, 0.5); }
+.wheel-center { animation: hub-glow 2.8s ease-in-out infinite; }
+.wheel-center:disabled { cursor: progress; animation: none; }
+@keyframes hub-glow {
+  50% { box-shadow: 0 0 0 4px var(--deep), 0 0 0 9px rgba(167, 139, 250, 0.35), 0 0 46px rgba(226, 201, 126, 0.85), inset 0 2px 4px rgba(255, 255, 255, 0.4); }
+}
 .wheel-center span { font-family: "Cinzel Decorative", serif; font-size: 0.42rem; font-weight: 900; color: var(--deep); letter-spacing: 0.05em; text-align: center; line-height: 1.4; user-select: none; }
 
-.spin-btn {
-  font-family: "Cinzel", serif; font-size: 1rem; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; padding: 15px 52px;
-  background: linear-gradient(135deg, var(--purple-dark), var(--purple-mid)); border: 1px solid var(--lavender); color: var(--lavender-light); cursor: pointer;
-  clip-path: polygon(14px 0%, calc(100% - 14px) 0%, 100% 50%, calc(100% - 14px) 100%, 14px 100%, 0% 50%); transition: all 0.3s ease; box-shadow: 0 0 20px rgba(124, 58, 237, 0.4);
-}
-.spin-btn:hover:not(:disabled), .spin-btn:focus-visible { background: linear-gradient(135deg, var(--purple-mid), var(--lavender)); color: var(--deep); transform: translateY(-2px); outline: none; }
-.spin-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 .pool-info { font-size: 0.95rem; color: rgba(196, 181, 253, 0.7); text-align: center; min-height: 1.2em; }
 .pool-info b { color: var(--gold-light); }
+.spin-hint { display: block; margin-top: 4px; font-family: "Cinzel", serif; font-size: 0.68rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold); opacity: 0.6; }
 .link-btn { background: none; border: none; color: var(--gold); text-decoration: underline; cursor: pointer; font-style: italic; }
 
 /* Result Card */
@@ -106,6 +105,8 @@ canvas#wheel { position: relative; width: 100%; height: 100%; border-radius: 50%
 .result-card::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, transparent, var(--gold), var(--lavender), var(--gold), transparent); }
 @keyframes fadeSlideUp { from { opacity: 0; transform: translateY(20px); } }
 .result-card.visible { display: block; }
+.peek-kitty { position: absolute; top: 8px; right: 12px; width: 72px; pointer-events: none; animation: k-bob 4s ease-in-out infinite; }
+.result-card .result-fate-label, .result-card .result-task-name { padding-right: 74px; }
 .result-fate-label { font-family: "Cinzel", serif; font-size: 0.7rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--gold); opacity: 0.8; margin-bottom: 6px; }
 .result-task-name { font-family: "Cinzel", serif; font-size: 1.3rem; font-weight: 600; color: var(--lavender-light); margin-bottom: 14px; text-shadow: 0 0 20px rgba(167, 139, 250, 0.4); overflow-wrap: anywhere; }
 .result-meta { display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
@@ -210,6 +211,7 @@ input::placeholder, textarea::placeholder { color: rgba(167, 139, 250, 0.35); }
 .delete-btn:hover { color: var(--danger); background: rgba(248, 113, 113, 0.1); }
 .empty-state { text-align: center; padding: 30px 16px; color: rgba(167, 139, 250, 0.45); font-style: italic; font-size: 0.95rem; }
 .empty-state-icon { font-size: 1.8rem; display: block; margin-bottom: 10px; }
+.empty-state-icon .k-curled { width: 76px; display: block; margin: 0 auto; animation: k-breathe 3.5s ease-in-out infinite; transform-origin: 50% 100%; }
 .count-badge { background: var(--purple-mid); color: var(--white); border-radius: 10px; padding: 2px 8px; font-size: 0.7rem; font-family: "Cinzel", serif; letter-spacing: 0.05em; }
 .clear-btn {
   background: none; border: 1px solid rgba(248, 113, 113, 0.3); border-radius: 6px; color: rgba(248, 113, 113, 0.6); font-family: "Cinzel", serif; font-size: 0.66rem;
@@ -255,10 +257,83 @@ input::placeholder, textarea::placeholder { color: rgba(167, 139, 250, 0.35); }
 
 @media (max-width: 480px) {
   .app { padding: 16px 12px 32px; gap: 20px; }
-  .spin-btn { padding: 13px 32px; font-size: 0.9rem; }
   .result-card { padding: 18px; }
   .home-link { width: 34px; height: 34px; }
 }
+
+
+/* ================= kitties ================= */
+.k-svg { display: block; width: 100%; height: auto; overflow: visible; }
+.k-svg * { transform-box: fill-box; }
+
+/* floating magic kitties among the stars */
+.kitty-sky { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+.k-floater { position: absolute; opacity: 0.38; animation: k-float 9s ease-in-out infinite; filter: drop-shadow(0 0 8px rgba(167, 139, 250, 0.35)); }
+.k-floater .k-blink { animation: k-blink var(--bd, 4s) steps(1) infinite; transform-origin: 50% 50%; }
+@keyframes k-float { 0%, 100% { transform: translate(0, 0) rotate(-4deg); } 50% { transform: translate(6px, -14px) rotate(4deg); } }
+@keyframes k-blink { 0%, 92%, 100% { transform: scaleY(1); } 95% { transform: scaleY(0.1); } }
+@keyframes k-bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+@keyframes k-breathe { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.04, 0.96); } }
+
+/* sleeping kitty on the moon, next to the title */
+.moon-kitty { position: absolute; right: 0; top: -6px; width: 118px; pointer-events: none; animation: k-bob 5s ease-in-out infinite; }
+.moon-kitty .k-zzz text { animation: k-zzz 3.6s ease-in-out infinite; opacity: 0; }
+.moon-kitty .k-zzz text:nth-child(2) { animation-delay: 0.6s; }
+.moon-kitty .k-zzz text:nth-child(3) { animation-delay: 1.2s; }
+.moon-kitty .k-sleeper { animation: k-breathe 3.6s ease-in-out infinite; transform-origin: 50% 100%; }
+@keyframes k-zzz { 0% { opacity: 0; transform: translate(0, 4px); } 30% { opacity: 0.9; } 100% { opacity: 0; transform: translate(6px, -8px); } }
+
+/* sorcerer cats beside the wheel */
+.sorcerer { position: absolute; z-index: 11; width: 25%; bottom: -2%; cursor: pointer; transition: transform 0.25s ease; filter: drop-shadow(0 6px 14px rgba(6, 0, 14, 0.7)) drop-shadow(0 0 10px rgba(124, 58, 237, 0.35)); }
+.sorcerer-left { left: -19%; }
+.sorcerer-right { right: -19%; transform: scaleX(-1); }
+.sorcerer-right .k-zzz { transform: scaleX(-1); }
+.sorcerer:hover { transform: translateY(-4px); }
+.sorcerer-right:hover { transform: scaleX(-1) translateY(-4px); }
+.sorcerer .k-eyes { animation: k-blink 4.6s steps(1) infinite; transform-origin: 50% 50%; }
+.sorcerer-right .k-eyes { animation-delay: -2.1s; }
+.sorcerer .k-tail { animation: k-tail 3.2s ease-in-out infinite; transform-origin: 0% 85%; }
+.sorcerer .k-hat { transform-origin: 50% 100%; }
+.sorcerer .k-arm { transform-origin: 0% 100%; }
+.sorcerer .k-sparkles { opacity: 0.35; transition: opacity 0.3s; }
+.sorcerer .k-ball { animation: k-orb 3.4s ease-in-out infinite; transform-origin: 50% 50%; }
+.sorcerer .k-mist { animation: k-mist 4s ease-in-out infinite; transform-origin: 50% 50%; }
+@keyframes k-tail { 0%, 100% { transform: rotate(-5deg); } 50% { transform: rotate(6deg); } }
+@keyframes k-orb { 0%, 100% { opacity: 0.88; } 50% { opacity: 1; } }
+@keyframes k-mist { 0%, 100% { transform: translate(-4px, 2px) scale(0.9); opacity: 0.25; } 50% { transform: translate(5px, -4px) scale(1.2); opacity: 0.5; } }
+
+/* while the wheel spins: the wand waves and sparkles, the crystal ball blazes */
+body.casting .sorcerer .k-arm { animation: k-cast 0.5s ease-in-out infinite alternate; }
+body.casting .sorcerer .k-sparkles { opacity: 1; animation: k-sparkle 0.35s steps(2) infinite; }
+body.casting .sorcerer .k-star { animation: k-starspin 0.9s linear infinite; transform-origin: 50% 50%; }
+body.casting .sorcerer .k-ball { animation: k-blaze 0.45s ease-in-out infinite alternate; }
+body.casting .sorcerer .k-mist { animation-duration: 0.8s; }
+@keyframes k-cast { from { transform: rotate(-14deg); } to { transform: rotate(10deg); } }
+@keyframes k-sparkle { 50% { opacity: 0.3; } }
+@keyframes k-starspin { to { transform: rotate(360deg); } }
+@keyframes k-blaze { from { filter: brightness(1); } to { filter: brightness(1.45) drop-shadow(0 0 6px #f5e3a3); } }
+
+/* when the wheel lands: a happy hop */
+body.cheer .sorcerer .k-body { animation: k-hop 0.45s ease-out 3; transform-origin: 50% 100%; }
+body.cheer .sorcerer .k-hat { animation: k-hatpop 0.45s ease-out 3; }
+@keyframes k-hop { 40% { transform: translateY(-10%) scale(1.02, 0.98); } }
+@keyframes k-hatpop { 40% { transform: translateY(-8%) rotate(-6deg); } }
+
+/* narrower layouts: cats sit at the wheel's bottom corners */
+@media (max-width: 1180px) {
+  .sorcerer { width: 24%; bottom: -9%; }
+  .sorcerer-left { left: -6%; }
+  .sorcerer-right { right: -6%; }
+  .wheel-container { margin-bottom: calc(16px + 8%); }
+}
+@media (max-width: 640px) {
+  .moon-kitty { width: 56px; top: -12px; }
+  .peek-kitty { width: 56px; }
+  .result-card .result-fate-label, .result-card .result-task-name { padding-right: 58px; }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .star, .wheel-outer-ring { animation: none; }
+  .star, .wheel-outer-ring, .wheel-center, .k-floater, .moon-kitty, .peek-kitty,
+  .k-svg *, .empty-state-icon .k-curled { animation: none !important; }
+  .moon-kitty .k-zzz text { opacity: 0.7; }
 }

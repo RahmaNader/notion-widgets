@@ -195,7 +195,9 @@
     spinning = true;
     highlight = null;
     hideResult();
-    $("spinBtn").disabled = true;
+    $("wheelHub").disabled = true;
+    document.body.classList.remove("cheer");
+    document.body.classList.add("casting");
     // choose the winner first (weighted, crypto random), then aim the wheel at it
     const total = segs.reduce((a, s) => a + (s.end - s.start), 0);
     let r = rand() * total, win = segs[segs.length - 1];
@@ -221,7 +223,10 @@
       rot = rot % TAU;
       st.rotation = rot;
       spinning = false;
-      $("spinBtn").disabled = false;
+      $("wheelHub").disabled = false;
+      document.body.classList.remove("casting");
+      document.body.classList.add("cheer");
+      setTimeout(() => document.body.classList.remove("cheer"), 1800);
       highlight = win.task.id;
       draw();
       tick(true);
@@ -287,7 +292,8 @@
     if (list.length !== st.tasks.length) parts.push(`${st.tasks.length - list.length} filtered out`);
     if (st.settings.noRepeat && list.length - p.length > 0)
       parts.push(`${list.length - p.length} already chosen · <button class="link-btn" data-act="new-round">new round</button>`);
-    $("poolInfo").innerHTML = st.tasks.length ? parts.join(" · ") : "";
+    $("poolInfo").innerHTML = (st.tasks.length ? parts.join(" · ") : "") +
+      (p.length ? `<span class="spin-hint">✦ tap the golden seal, a sorcerer cat, or press Space to spin ✦</span>` : "");
 
     // task list
     const q = st.filters.search.toLowerCase();
@@ -307,7 +313,7 @@
             <div class="task-info"><div class="task-name" title="${esc(t.name)}">${esc(t.name)}</div><div class="task-details">${details.map((d) => `<span>${d}</span>`).join("")}</div></div>
             <button class="delete-btn" data-act="delete" data-id="${t.id}" title="Remove" aria-label="Remove ${esc(t.name)}">✕</button></div>`;
         }).join("")
-      : `<div class="empty-state"><span class="empty-state-icon">🌀</span>${st.tasks.length ? "No task matches your search." : "No tasks yet — import your Notion export or add some by hand."}</div>`;
+      : `<div class="empty-state"><span class="empty-state-icon">${TO.kitties ? TO.kitties.curled() : "🌀"}</span>${st.tasks.length ? "No task matches your search." : "No tasks yet — import your Notion export or add some by hand."}</div>`;
 
     // filters
     const facets = FACETS.map(({ key, label }) => {
@@ -477,7 +483,6 @@
   }
 
   /* ================= events ================= */
-  $("spinBtn").addEventListener("click", spin);
   $("wheelHub").addEventListener("click", spin);
   document.addEventListener("keydown", (e) => {
     if ((e.key === " " || e.key === "Enter") && !e.target.closest("input,textarea,select,button,a") && !document.querySelector(".modal-overlay")) {
@@ -597,6 +602,7 @@
   if (window.ResizeObserver) new ResizeObserver(sizeCanvas).observe(canvas);
 
   /* ================= init ================= */
+  if (TO.kitties) TO.kitties.mount();
   segs = segments(pool());
   renderSide();
   sizeCanvas();
