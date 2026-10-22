@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Multi Timer</title>
+    <meta name="description" content="Run many countdown, interval, pomodoro, count-up and stopwatch timers on boards. Import timers from Excel, CSV, Notion or a linked Google Sheet." />
+
+    <!-- Favicon (Stopwatch) -->
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⏱️</text></svg>"
+    />
+
+    <!-- Apply saved theme before paint (same keys as the home page) -->
+    <script>
+      (function () {
+        var d = document.documentElement;
+        if (localStorage.theme === "dark" || (!("theme" in localStorage) && window.matchMedia("(prefers-color-scheme: dark)").matches)) d.classList.add("dark");
+        var c = localStorage.getItem("colorTheme");
+        if (c && c !== "purple") d.setAttribute("data-theme", c);
+      })();
+    </script>
+
+    <!-- Tailwind CSS (CDN) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              brand: "var(--brand-color)",
+              brandHover: "var(--brand-hover)",
+              brandLight: "var(--brand-light)",
+              brandText: "var(--brand-text)",
+              darkBg: "#111827",
+              darkSurface: "#1f2937",
+              darkBorder: "#374151",
+            },
+            fontFamily: {
+              sans: ["Inter", "sans-serif"],
+              display: ["Fredoka", "sans-serif"],
+            },
+          },
+        },
+      };
+    </script>
+
+    <!-- External Libraries -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700&family=Fredoka:wght@500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <!-- SheetJS: reads/writes .xlsx (CSV import works without it) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body class="bg-gray-50 dark:bg-darkBg text-gray-800 dark:text-gray-100 h-screen flex flex-col overflow-hidden">
+    <header
+      id="app-header"
+      class="bg-white dark:bg-darkSurface border-b border-gray-200 dark:border-darkBorder shadow-sm z-30 shrink-0 h-16"
+    ></header>
+
+    <main id="app-main" class="flex-1 overflow-y-auto workspace-bg"></main>
+
+    <!-- Drawer -->
+    <div id="drawer-backdrop" class="mt-drawer-backdrop"></div>
+    <aside id="drawer" class="mt-drawer" aria-label="Menu">
+      <div class="flex items-center gap-3 px-5 h-16 border-b border-gray-100 dark:border-darkBorder">
+        <div class="w-9 h-9 rounded-xl bg-brandLight dark:bg-darkBorder text-brand flex items-center justify-center">
+          <i class="fa-solid fa-stopwatch"></i>
+        </div>
+        <div>
+          <div class="font-bold font-display text-gray-800 dark:text-white leading-tight">Multi Timer</div>
+          <div class="text-[10px] text-brand font-semibold uppercase tracking-wide">Menu</div>
+        </div>
+      </div>
+      <nav id="drawer-body" class="flex-1 overflow-y-auto py-2"></nav>
+    </aside>
+
+    <div id="overlay-root"></div>
+    <div id="toast-root" class="mt-toast-root" aria-live="polite"></div>
+    <input type="file" id="file-import" class="hidden" accept=".xlsx,.xls,.xlsm,.ods,.csv,.tsv,.txt,.mt,.json" />
+
+    <script src="js/util.js"></script>
+    <script src="js/icons.js"></script>
+    <script src="js/store.js"></script>
+    <script src="js/engine.js"></script>
+    <script src="js/sounds.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/render.js"></script>
+    <script src="js/editor.js"></script>
+    <script src="js/boards.js"></script>
+    <script src="js/history.js"></script>
+    <script src="js/settings.js"></script>
+    <script src="js/io.js"></script>
+    <script src="js/app.js"></script>
+  </body>
+</html>
