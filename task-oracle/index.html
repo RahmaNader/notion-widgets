@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>✦ The Task Oracle ✦</title>
+    <meta name="description" content="Spin a wheel to pick a random task from your Notion Tasks or Reoccurring tasks export." />
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔮</text></svg>" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Cinzel:wght@400;600&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap"
+      rel="stylesheet"
+    />
+    <!-- SheetJS: reads/writes .xlsx (CSV works without it) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="stars" id="stars"></div>
+
+    <div class="app">
+      <header>
+        <a href="../index.html" class="home-link" title="Back to Home" aria-label="Back to Home">←</a>
+        <div class="title-ornament"><div class="ornament-line"></div><div class="ornament-gem"></div><div class="ornament-line"></div></div>
+        <h1>The Task Oracle</h1>
+        <p class="subtitle">Spin &nbsp;·&nbsp; Discover &nbsp;·&nbsp; Conquer</p>
+      </header>
+
+      <div class="main-grid">
+        <!-- Wheel -->
+        <section class="wheel-section">
+          <div class="wheel-container">
+            <div class="wheel-outer-ring"></div>
+            <div class="wheel-pointer" aria-hidden="true">
+              <svg width="36" height="48" viewBox="0 0 36 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                  <linearGradient id="goldGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#f5e3a3" /><stop offset="100%" stop-color="#b8860b" /></linearGradient>
+                  <filter id="ptrGlow"><feGaussianBlur stdDeviation="2" result="blur" /><feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge></filter>
+                </defs>
+                <polygon points="18,48 0,10 18,0 36,10" fill="url(#goldGrad)" filter="url(#ptrGlow)" />
+                <circle cx="18" cy="10" r="5" fill="#f5e3a3" />
+              </svg>
+            </div>
+            <canvas id="wheel" width="500" height="500" aria-label="Task wheel"></canvas>
+            <button class="wheel-center" id="wheelHub" title="Spin the wheel" aria-label="Spin the wheel"><span>SPIN<br />THE<br />WHEEL</span></button>
+          </div>
+
+          <button class="spin-btn" id="spinBtn">✦ Reveal My Fate ✦</button>
+          <div class="pool-info" id="poolInfo"></div>
+
+          <div class="result-card" id="resultCard" aria-live="polite">
+            <div class="result-fate-label">✦ Your Fate Has Spoken ✦</div>
+            <div class="result-task-name" id="resultName">—</div>
+            <div class="result-meta" id="resultMeta"></div>
+            <div id="resultItemsSection" style="display: none">
+              <div class="result-items-label">◈ Required Items</div>
+              <div class="result-items" id="resultItemsList"></div>
+            </div>
+            <p class="result-notes" id="resultNotes" style="display: none"></p>
+            <div class="result-actions">
+              <button class="act-btn primary" data-act="done">✓ Done</button>
+              <button class="act-btn" data-act="again">↻ Spin again</button>
+              <button class="act-btn" data-act="copy" title="Copy the name to find it in Notion">⧉ Copy name</button>
+              <a class="act-btn" id="resultLink" href="#" target="_blank" rel="noopener" style="display: none">↗ Open link</a>
+              <button class="act-btn subtle" data-act="remove">✕ Remove from wheel</button>
+            </div>
+            <div class="result-source" id="resultSource"></div>
+          </div>
+        </section>
+
+        <!-- Panel -->
+        <aside class="panel">
+          <div class="panel-card">
+            <div class="panel-header"><span class="panel-title">✦ Summon Tasks</span></div>
+            <div class="panel-body">
+              <div class="tabs">
+                <button class="tab-btn active" data-tab="import">📜 Import</button>
+                <button class="tab-btn" data-tab="manual">✎ By hand</button>
+              </div>
+
+              <div class="tab-pane active" id="tab-import">
+                <label class="csv-drop" id="dropZone">
+                  <input type="file" id="fileInput" accept=".xlsx,.xls,.ods,.csv,.tsv,.txt" />
+                  <span class="csv-icon">📜</span>
+                  <span class="csv-hint">Drop your Excel or CSV here, or click to browse</span>
+                  <span class="csv-hint dim">Notion Tasks &amp; Reoccurring tasks exports are recognised</span>
+                </label>
+                <details class="howto">
+                  <summary>How to export from Notion</summary>
+                  <ol>
+                    <li>Open <b>Tasks</b> or <b>Reoccurring tasks</b> as a full page.</li>
+                    <li><b>•••</b> (top right) → <b>Export</b> → format <b>Markdown &amp; CSV</b> → Export.</li>
+                    <li>Unzip the download and drop the <code>…_all.csv</code> file here (it contains every row, not only the current view). An Excel copy of it works too.</li>
+                  </ol>
+                  <p>Columns used: Name, Time block, Category, Tags, Routine, Priority, Progress, Status, Items, Notes, Link, Day, Optional, Hide. Done/Cancelled and hidden tasks are skipped by default.</p>
+                </details>
+                <div class="row-btns">
+                  <button class="ghost-btn" id="templateBtn">⇩ Excel template</button>
+                  <button class="ghost-btn" id="exportBtn">⇪ Export wheel</button>
+                </div>
+              </div>
+
+              <form class="tab-pane" id="tab-manual" autocomplete="off">
+                <div class="form-group"><label for="taskName">Task Name *</label><input type="text" id="taskName" placeholder="e.g. Review wireframes…" /></div>
+                <div class="form-row">
+                  <div class="form-group"><label for="taskTime">Time Required</label><input type="text" id="taskTime" placeholder="e.g. 45 m" /></div>
+                  <div class="form-group">
+                    <label for="taskPriority">Priority</label>
+                    <select id="taskPriority" class="select"><option value="">—</option><option>Low</option><option>Medium</option><option>High</option><option>Extremely High</option></select>
+                  </div>
+                </div>
+                <div class="form-group"><label for="taskCategory">Category <em>(comma-separated)</em></label><input type="text" id="taskCategory" placeholder="e.g. Cleaning, Home" /></div>
+                <div class="form-group"><label for="taskItems">Required Items <em>(comma-separated)</em></label><input type="text" id="taskItems" placeholder="e.g. laptop, notebook, coffee…" /></div>
+                <div class="form-group"><label for="taskNotes">Notes <em>(optional)</em></label><textarea id="taskNotes" placeholder="Any additional notes…"></textarea></div>
+                <button class="add-btn" type="submit">✦ Add to Wheel</button>
+              </form>
+            </div>
+          </div>
+
+          <div class="panel-card">
+            <div class="panel-header"><span class="panel-title">✦ Filters <span class="count-badge" id="filterBadge" style="display: none"></span></span></div>
+            <div class="panel-body" id="filterBody"></div>
+          </div>
+
+          <div class="panel-card">
+            <div class="panel-header"><span class="panel-title">✦ Rules of the Oracle</span></div>
+            <div class="panel-body rules">
+              <label class="toggle-row"><input type="checkbox" id="ruleNoRepeat" /><span>No repeats until every task has been chosen</span></label>
+              <label class="toggle-row"><input type="checkbox" id="ruleWeighted" /><span>Favour higher priority <em>(bigger slices)</em></span></label>
+              <label class="toggle-row"><input type="checkbox" id="ruleSound" /><span>Wheel sounds</span></label>
+            </div>
+          </div>
+
+          <div class="panel-card">
+            <div class="panel-header">
+              <span class="panel-title">✦ On The Wheel <span class="count-badge" id="taskCount">0</span></span>
+              <button class="clear-btn" data-act="clear-all">Clear All</button>
+            </div>
+            <div class="panel-body tight">
+              <input type="text" id="taskSearch" class="search" placeholder="Search tasks…" />
+              <div class="task-list" id="taskList"></div>
+            </div>
+          </div>
+
+          <div class="panel-card">
+            <div class="panel-header">
+              <span class="panel-title">✦ Recent Fates</span>
+              <button class="clear-btn" data-act="clear-history">Clear</button>
+            </div>
+            <div class="panel-body tight" id="historyList"></div>
+          </div>
+        </aside>
+      </div>
+    </div>
+
+    <div class="toast" id="toast" role="status"></div>
+
+    <script src="js/import.js"></script>
+    <script src="js/app.js"></script>
+  </body>
+</html>
