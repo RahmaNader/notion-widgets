@@ -25,7 +25,7 @@
     picked: [],
     history: [],
     filters: { category: [], routine: [], tags: [], priority: [], source: [], maxMinutes: 0, today: false, search: "" },
-    settings: { noRepeat: true, weighted: false, sound: true, sky: "twilight" },
+    settings: { noRepeat: true, weighted: false, sound: true, sky: "dusk", skyPicked: false },
     lastResult: null,
     rotation: 0,
   });
@@ -33,6 +33,7 @@
   try { st = Object.assign(fresh(), JSON.parse(localStorage.getItem(KEY)) || {}); } catch (e) { st = fresh(); }
   st.filters = Object.assign(fresh().filters, st.filters);
   st.settings = Object.assign(fresh().settings, st.settings);
+  if (!st.settings.skyPicked) st.settings.sky = "dusk"; // older saves stored the default sky; follow the current default
   const save = () => { try { localStorage.setItem(KEY, JSON.stringify(st)); } catch (e) { toast("Couldn't save — browser storage is blocked or full"); } };
 
   /* ================= pool ================= */
@@ -71,8 +72,8 @@
   /* ================= wheel drawing ================= */
   const cssVar = (name, fallback) => getComputedStyle(document.documentElement).getPropertyValue(name).trim() || fallback;
   function applySky() {
-    if (st.settings.sky === "midnight") document.documentElement.dataset.sky = "midnight";
-    else delete document.documentElement.dataset.sky;
+    if (st.settings.sky === "twilight") delete document.documentElement.dataset.sky;
+    else document.documentElement.dataset.sky = st.settings.sky;
     document.querySelectorAll(".sky-switch button").forEach((b) => b.classList.toggle("on", b.dataset.sky === st.settings.sky));
   }
   const canvas = $("wheel");
@@ -559,6 +560,7 @@
 
   document.querySelectorAll(".sky-switch button").forEach((b) => b.addEventListener("click", () => {
     st.settings.sky = b.dataset.sky;
+    st.settings.skyPicked = true;
     save();
     applySky();
     draw();
