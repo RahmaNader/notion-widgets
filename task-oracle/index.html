@@ -13,6 +13,9 @@
     <!-- SheetJS: reads/writes .xlsx (CSV works without it) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <link rel="stylesheet" href="style.css" />
+    <script>
+      try { var sky = (JSON.parse(localStorage.getItem("taskOracle.v1")) || {}).settings; if (sky && sky.sky === "midnight") document.documentElement.dataset.sky = "midnight"; } catch (e) {}
+    </script>
   </head>
   <body>
     <div class="stars" id="stars"></div>
@@ -131,6 +134,11 @@
               <label class="toggle-row"><input type="checkbox" id="ruleNoRepeat" /><span>No repeats until every task has been chosen</span></label>
               <label class="toggle-row"><input type="checkbox" id="ruleWeighted" /><span>Favour higher priority <em>(bigger slices)</em></span></label>
               <label class="toggle-row"><input type="checkbox" id="ruleSound" /><span>Wheel sounds</span></label>
+              <label>Sky</label>
+              <div class="sky-switch" role="group" aria-label="Background">
+                <button type="button" data-sky="twilight">☾ Twilight</button>
+                <button type="button" data-sky="midnight">✦ Midnight</button>
+              </div>
             </div>
           </div>
 

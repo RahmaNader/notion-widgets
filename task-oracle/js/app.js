@@ -25,7 +25,7 @@
     picked: [],
     history: [],
     filters: { category: [], routine: [], tags: [], priority: [], source: [], maxMinutes: 0, today: false, search: "" },
-    settings: { noRepeat: true, weighted: false, sound: true },
+    settings: { noRepeat: true, weighted: false, sound: true, sky: "twilight" },
     lastResult: null,
     rotation: 0,
   });
@@ -69,6 +69,12 @@
   }
 
   /* ================= wheel drawing ================= */
+  const cssVar = (name, fallback) => getComputedStyle(document.documentElement).getPropertyValue(name).trim() || fallback;
+  function applySky() {
+    if (st.settings.sky === "midnight") document.documentElement.dataset.sky = "midnight";
+    else delete document.documentElement.dataset.sky;
+    document.querySelectorAll(".sky-switch button").forEach((b) => b.classList.toggle("on", b.dataset.sky === st.settings.sky));
+  }
   const canvas = $("wheel");
   const ctx = canvas.getContext("2d");
   let segs = [];
@@ -90,7 +96,7 @@
     ctx.clearRect(0, 0, W, W);
     if (!segs.length) {
       const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, R);
-      g.addColorStop(0, "#2d0060"); g.addColorStop(1, "#100020");
+      g.addColorStop(0, cssVar("--hub-in", "#2d0060")); g.addColorStop(1, cssVar("--ring", "#100020"));
       ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI * 2); ctx.fillStyle = g; ctx.fill();
       ctx.strokeStyle = "rgba(167,139,250,0.25)"; ctx.lineWidth = 2 * k; ctx.stroke();
       ctx.fillStyle = "rgba(167,139,250,0.45)"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
@@ -145,7 +151,7 @@
   }
   function drawHub(cx, cy, k) {
     const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, 40 * k);
-    g.addColorStop(0, "#1a0030"); g.addColorStop(1, "#06000e");
+    g.addColorStop(0, cssVar("--hub-in", "#1a0030")); g.addColorStop(1, cssVar("--hub-out", "#06000e"));
     ctx.beginPath(); ctx.arc(cx, cy, 40 * k, 0, Math.PI * 2); ctx.fillStyle = g; ctx.fill();
     ctx.strokeStyle = "rgba(167,139,250,0.35)"; ctx.lineWidth = 1.5 * k; ctx.stroke();
   }
@@ -336,7 +342,8 @@
           </select>${st.filters.maxMinutes ? `<div class="hint">Tasks without a time block are hidden.</div>` : ""}</div>` : ""}
         ${hasDays ? `<label class="toggle-row"><input type="checkbox" id="todayOnly" ${st.filters.today ? "checked" : ""}/><span>Only today's tasks (${today()})</span></label>` : ""}
         ${facets}
-        ${active ? `<button class="clear-btn" data-act="clear-filters">Clear filters</button>` : ""}`
+        ${active ? `<button class="clear-btn" data-act="clear-filters">Clear filters</button>` : ""}
+        ${!hasTimes && !hasDays && !facets.trim() ? `<div class="hint">These tasks have no time block, category, routine, tags, priority or day to filter by.</div>` : ""}`
       : `<div class="hint">Filters appear once the wheel has tasks.</div>`;
     $("filterBadge").textContent = active ? "on" : "";
     $("filterBadge").style.display = active ? "" : "none";
@@ -345,6 +352,7 @@
     $("ruleNoRepeat").checked = st.settings.noRepeat;
     $("ruleWeighted").checked = st.settings.weighted;
     $("ruleSound").checked = st.settings.sound;
+    applySky();
 
     // history
     $("historyList").innerHTML = st.history.length
@@ -548,6 +556,13 @@
     if (e.target.id === "maxMinutes") { st.filters.maxMinutes = +e.target.value; save(); hideResult(); rebuild(); }
     if (e.target.id === "todayOnly") { st.filters.today = e.target.checked; save(); hideResult(); rebuild(); }
   });
+
+  document.querySelectorAll(".sky-switch button").forEach((b) => b.addEventListener("click", () => {
+    st.settings.sky = b.dataset.sky;
+    save();
+    applySky();
+    draw();
+  }));
 
   document.addEventListener("click", async (e) => {
     const b = e.target.closest("[data-act]");
