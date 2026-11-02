@@ -30,6 +30,7 @@ window.MT = window.MT || {};
     const mode = set().display;
     const anyRunning = S.allElements().some(({ el }) => el.rt && el.rt.status === "running");
     const want = document.visibilityState === "visible" && (mode === "always" || (mode === "running" && anyRunning));
+    if (MT.native) { MT.native.keepAwake(want); return; }
     try {
       if (want && !lock && navigator.wakeLock) {
         lock = await navigator.wakeLock.request("screen");
@@ -54,11 +55,15 @@ window.MT = window.MT || {};
       relay: ["On — sent through the notifier window. Keep it open (minimized is fine).", btn("notif-test", "Test") + btn("notif-off", "Turn off", "ghost")],
       "relay-permission": ["Almost there — click “Allow notifications” in the notifier window", btn("notif-reopen", "Show window", "primary") + btn("notif-off", "Turn off", "ghost")],
       "relay-closed": ["The notifier window is closed, so notifications are paused", btn("notif-reopen", "Reopen window", "primary") + btn("notif-off", "Turn off", "ghost")],
+      "native-off": ["Off — turn on to hear alarms when the app is closed or the phone is locked", btn("notif-on", "Turn on", "primary")],
+      "native-on": ["On — alarms ring even when the app is closed", btn("notif-test", "Test") + btn("notif-off", "Turn off", "ghost")],
+      "native-exact": ["Allow “Alarms & reminders” so alarms ring exactly on time", btn("notif-exact", "Allow", "primary") + btn("notif-off", "Turn off", "ghost")],
+      "native-blocked": ["Notifications are blocked for Multi Timer. Android Settings → Apps → Multi Timer → Notifications → Allow, then tap Turn on.", btn("notif-on", "Turn on")],
     };
     const [sub, buttons] = map[s];
     const embed = MT.notify.crossOriginFrame()
       ? `<span class="mt-sub block mt-1">Inside Notion, browsers don't let embeds show notifications, so a small notifier window sends them for this widget.</span>` : "";
-    return `<div class="mt-list-row flex-wrap gap-2"><span class="flex-1 min-w-[180px]"><span class="block font-medium">Desktop notifications</span>
+    return `<div class="mt-list-row flex-wrap gap-2"><span class="flex-1 min-w-[180px]"><span class="block font-medium">${MT.native ? "Alarm notifications" : "Desktop notifications"}</span>
       <span class="mt-sub block">${sub}</span>${embed}</span><span class="flex gap-2">${buttons}</span></div>`;
   };
 
@@ -129,7 +134,9 @@ window.MT = window.MT || {};
           notifRow() +
           toggle("Show countdown in tab title", "The next timer to finish is shown in the browser tab title.", "titleStatus") +
           toggle("Show full-screen alert", "A full-screen alert with stop, snooze and reset buttons when a timer ends.", "fullScreenAlert"));
-        h += `<p class="mt-sub px-1">Alerts play while this page (or the Notion page embedding it) is open.</p>`;
+        h += MT.native
+          ? `<p class="mt-sub px-1">If alarms arrive late, set Android Settings → Apps → Multi Timer → Battery → Unrestricted.</p>`
+          : `<p class="mt-sub px-1">Alerts play while this page (or the Notion page embedding it) is open.</p>`;
         break;
       case "sounds": {
         const q = (ST.soundQuery || "").toLowerCase();
@@ -230,6 +237,7 @@ window.MT = window.MT || {};
       case "notif-off": MT.notify.disable(); A().render(); break;
       case "notif-test": MT.notify.test(); break;
       case "notif-reopen": MT.notify.openNotifier(); break;
+      case "notif-exact": MT.native && MT.native.openExactSettings(); break;
       case "open-history": MT.history.open(); break;
       case "clear-history":
         if (await UI.confirm("Delete all history records?", { okLabel: "Delete", danger: true })) { S.state.history = []; S.save(); A().render(); }
@@ -246,6 +254,7 @@ window.MT = window.MT || {};
         if (await UI.confirm("Erase all Multi Timer data in this browser? Export a backup first if you need one.", { okLabel: "Erase everything", danger: true })) {
           localStorage.removeItem(S.KEY);
           S.load();
+          S.saveNow(); // also replaces the Android app's stored copy
           S.undoStack = [];
           MT.engine.ringing.forEach((r, id) => MT.engine.stopRinging(id));
           A().go("board");

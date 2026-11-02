@@ -138,6 +138,7 @@ window.MT = window.MT || {};
   };
 
   SND.vibrate = (pattern = [400, 200, 400, 200, 400]) => {
+    if (MT.native) return MT.native.vibrate(pattern);
     try { navigator.vibrate && navigator.vibrate(pattern); } catch (e) {}
   };
 })(window.MT);

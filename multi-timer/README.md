@@ -38,5 +38,8 @@ Settings → Alert settings → **Desktop notifications** (or the banner on the 
 - **Widget opened in its own tab:** the browser asks for permission once and the page shows the notifications itself.
 - **Widget embedded in Notion:** browsers don't let embeds show notifications, so turning them on opens a small **notifier window**. Allow notifications in it once, then keep it open (minimized is fine). The embed sends it the timers' end times, so notifications arrive on time even when the Notion tab is in the background. If you close it, use **Reopen window** in Alert settings.
 
+## Android app
+Multi Timer is also available as an Android app that keeps its data on the phone and rings even when the app is closed. Download **MultiTimer.apk** from this repository's [latest release](https://github.com/RahmaNader/notion-widgets/releases/latest). See `android-app/README.md`.
+
 ## Browser limits
 Alarms and notifications only work while the page (or the Notion page that embeds it) is open. Timers are based on the clock, so a timer that finishes while the page is closed shows its overtime when you reopen it. Vibration works only in Android browsers. Keeping the screen on needs a browser that supports the Screen Wake Lock API.

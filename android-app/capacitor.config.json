@@ -1,0 +1,17 @@
+{
+  "appId": "io.github.rahmanader.multitimer",
+  "appName": "Multi Timer",
+  "webDir": "www",
+  "android": {
+    "backgroundColor": "#f8fafc"
+  },
+  "plugins": {
+    "SystemBars": {
+      "insetsHandling": "css"
+    },
+    "LocalNotifications": {
+      "smallIcon": "ic_stat_timer",
+      "iconColor": "#A855F7"
+    }
+  }
+}

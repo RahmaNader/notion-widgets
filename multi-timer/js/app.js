@@ -329,6 +329,7 @@ window.MT = window.MT || {};
   /* ---------- alarms ---------- */
   A.alarm = (el, opts = {}) => {
     if (opts.silent) return;
+    if (MT.native && MT.native.inBackground()) return; // Android app in background: the scheduled system alarm rings instead
     const st = S.state.settings;
     const a = el.alert || {};
     const sound = a.sound || st.defaultSound;
@@ -472,7 +473,11 @@ window.MT = window.MT || {};
     MT.notifyCore.ticker(() => { tick(); if (beats++ % 3 === 0) MT.notify.heartbeat(); }, 1000);
     MT.io.checkHashImport();
     MT.io.autoSync();
+    A.started = true;
+    if (MT.native) MT.native.afterBoot();
   };
 
-  document.addEventListener("DOMContentLoaded", A.boot);
+  // in the Android app, restore storage and set up native alarms before booting
+  document.addEventListener("DOMContentLoaded", () =>
+    (MT.native ? MT.native.init().catch((e) => console.warn("Multi Timer: native init failed", e)) : Promise.resolve()).then(A.boot));
 })(window.MT);
