@@ -122,7 +122,9 @@ window.MT = window.MT || {};
 
   S.saveNow = () => {
     try {
-      localStorage.setItem(KEY, JSON.stringify(S.state));
+      const json = JSON.stringify(S.state);
+      localStorage.setItem(KEY, json);
+      if (MT.native) MT.native.persist(json); // Android app: also keep a copy in app storage
     } catch (e) {
       console.error("Multi Timer: save failed", e);
       MT.ui && MT.ui.toast("Could not save — browser storage is full or blocked", "error");

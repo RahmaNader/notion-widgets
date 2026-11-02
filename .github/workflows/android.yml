@@ -1,0 +1,88 @@
+name: Multi Timer Android app
+
+on:
+  push:
+    branches: [master]
+    paths: ["multi-timer/**", "android-app/**", ".github/workflows/android.yml"]
+  pull_request:
+    paths: ["multi-timer/**", "android-app/**", ".github/workflows/android.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: write # publish the APK as a GitHub Release
+
+concurrency:
+  group: android-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    env:
+      VERSION_CODE: ${{ github.run_number }}
+      VERSION_NAME: 1.0.${{ github.run_number }}
+      HAS_PRIVATE_KEY: ${{ secrets.ANDROID_KEYSTORE_B64 != '' }}
+    defaults:
+      run:
+        working-directory: android-app
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: android-app/package-lock.json
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+          cache: gradle
+
+      - name: Build the offline web app
+        run: |
+          npm ci
+          node build-web.mjs
+          npx cap sync android
+
+      - name: Use the private signing key from repository secrets (optional)
+        if: env.HAS_PRIVATE_KEY == 'true'
+        env:
+          KEYSTORE_B64: ${{ secrets.ANDROID_KEYSTORE_B64 }}
+        run: |
+          echo "$KEYSTORE_B64" | base64 -d > "$RUNNER_TEMP/release.jks"
+          echo "ANDROID_KEYSTORE_FILE=$RUNNER_TEMP/release.jks" >> "$GITHUB_ENV"
+
+      - name: Build the APK
+        working-directory: android-app/android
+        env:
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleRelease --no-daemon
+          cp app/build/outputs/apk/release/app-release.apk "$RUNNER_TEMP/MultiTimer.apk"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: MultiTimer-${{ env.VERSION_NAME }}
+          path: ${{ runner.temp }}/MultiTimer.apk
+
+      - name: Explain why nothing was published
+        if: github.event_name != 'pull_request' && env.HAS_PRIVATE_KEY != 'true'
+        run: |
+          echo "::warning::APK built but not published: add the ANDROID_KEYSTORE_B64 and ANDROID_KEYSTORE_PASSWORD repository secrets (see android-app/README.md), then re-run this workflow."
+          echo "### APK not published" >> "$GITHUB_STEP_SUMMARY"
+          echo "Add the signing secrets described in android-app/README.md, then re-run. (A build signed with a temporary key couldn't be updated later without losing data.)" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Publish the APK as a release
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/master' && env.HAS_PRIVATE_KEY == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "multitimer-android-v${VERSION_NAME}" "$RUNNER_TEMP/MultiTimer.apk" \
+            --target "$GITHUB_SHA" --latest \
+            --title "Multi Timer for Android ${VERSION_NAME}" \
+            --notes "Download **MultiTimer.apk** below on your phone and open it to install (allow installing apps from your browser/Files when Android asks). Installing a newer version over the old one keeps your timers. See android-app/README.md."

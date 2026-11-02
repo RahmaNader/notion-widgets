@@ -158,6 +158,7 @@ window.MT = window.MT || {};
   /* ---------- Files ---------- */
   U.download = (filename, data, mime = "application/octet-stream") => {
     const blob = data instanceof Blob ? data : new Blob([data], { type: mime });
+    if (MT.native) return MT.native.saveFile(filename, blob); // Android app: share sheet instead of a download
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;

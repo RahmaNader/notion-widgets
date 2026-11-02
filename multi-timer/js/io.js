@@ -409,7 +409,7 @@ window.MT = window.MT || {};
       };
       add(sheetName, rows);
       extraSheets.forEach(([n, d]) => add(n, d));
-      XLSX.writeFile(wb, filename + ".xlsx");
+      U.download(filename + ".xlsx", XLSX.write(wb, { bookType: "xlsx", type: "array" }), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
     } else {
       U.download(filename + ".csv", "﻿" + U.toCSV(rows), "text/csv");
       UI.toast("Excel library unavailable — saved as CSV instead");

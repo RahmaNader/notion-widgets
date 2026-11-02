@@ -317,3 +317,12 @@ button.mt-list-row:hover { background: color-mix(in srgb, var(--brand-color) 6%,
 
 /* notifications prompt */
 .mt-banner { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; background: var(--surface); border: 1px solid color-mix(in srgb, var(--brand-color) 35%, var(--border)); border-radius: 14px; padding: 10px 12px 10px 16px; margin-bottom: 12px; font-size: .88rem; box-shadow: 0 6px 18px -12px var(--brand-color); }
+
+/* ---------- Android app (Capacitor): edge-to-edge safe areas, no link back to the widget home ---------- */
+.is-native a[href="../index.html"] { display: none; }
+.is-native #app-header { height: calc(4rem + var(--safe-area-inset-top, 0px)); padding-top: var(--safe-area-inset-top, 0px); }
+.is-native #app-main { padding-bottom: var(--safe-area-inset-bottom, 0px); }
+.is-native .mt-drawer { padding-top: var(--safe-area-inset-top, 0px); padding-bottom: var(--safe-area-inset-bottom, 0px); }
+.is-native .mt-sheet { padding-top: var(--safe-area-inset-top, 0px); padding-bottom: var(--safe-area-inset-bottom, 0px); }
+.is-native .mt-alert-overlay { padding-top: calc(16px + var(--safe-area-inset-top, 0px)); padding-bottom: calc(16px + var(--safe-area-inset-bottom, 0px)); }
+.is-native .mt-toast-root { bottom: calc(20px + var(--safe-area-inset-bottom, 0px)); }
